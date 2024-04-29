@@ -2,6 +2,7 @@
 using namespace std;
 int main ()
 {
-    cout << "bye";
-    cout << " why?";
+    cout << "bye" <<endl;
+    cout << "why?" <<endl;
+    cout << "cause why not?" << endl; 
 }

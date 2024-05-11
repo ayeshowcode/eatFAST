@@ -11,11 +11,11 @@ class Floor
 
 public:
     Floor(const string &floorName) : floorName(floorName) {}
-    Floor()
-    {
-        cout << "Multipurpose building has no floors!" << endl;
-    }
+    Floor() {}
     string getFloorName() const { return floorName; }
+    void displayFloor() const
+    {
+    }
 };
 
 class Location
@@ -31,6 +31,7 @@ class Building : public Location
     Floor floor;
 
 public:
+    Building(){};
     Building(const string &buildingName, const string &floorName) : buildingName(buildingName), floor(floorName) {}
     Building(const string &buildingName) : buildingName(buildingName) {}
 
@@ -42,13 +43,31 @@ public:
 class CSBuilding : public Building
 {
 public:
-    CSBuilding(string buildingName, const string &floorName) : Building(buildingName, floorName) {}
+    CSBuilding() {}
+    CSBuilding(string buildingName, string floorName) : Building(buildingName, floorName) {}
+    void displayFloors() const
+    {
+        cout << "CS Building has 2 floors! and basement" << endl;
+        cout << "0. Basement" << endl;
+        cout << "1. 1st Floor" << endl;
+        cout << "2. 2nd Floor" << endl;
+    }
 };
 
 class EEBuilding : public Building
 {
 public:
     EEBuilding(string buildingName, const string &floorName) : Building(buildingName, floorName) {}
+    void display() const
+    {
+        cout << "EE Building has 4 floors! and basement" << endl;
+        cout << "0. Basement" << endl;
+        cout << "1. A Floor" << endl;
+        cout << "2. B Floor" << endl;
+        cout << "3. C Floor" << endl;
+        cout << "4. D Floor" << endl;
+        cout << "5. E Floor" << endl;
+    }
 };
 
 class MultipurposeBuilding : public Building
@@ -78,7 +97,6 @@ public:
 class SportsArea : public Location
 {
 public:
-
     void describe() override
     {
         cout << " sports area." << endl;
@@ -107,7 +125,7 @@ public:
     Student(const string &name, Location *location) : User(name, location) {}
     void placeOrder() override
     {
-        cout << "Student " << name << " places an order from ";
+        cout << "Student " << name << " placing an order from ";
         location->describe();
     }
 };
@@ -118,7 +136,7 @@ public:
     Faculty(const string &name, Location *location) : User(name, location) {}
     void placeOrder() override
     {
-        cout << "Faculty " << name << " places an order from ";
+        cout << "Faculty " << name << " placeing an order from ";
         location->describe();
     }
 };
@@ -135,45 +153,111 @@ protected:
 
 public:
     Menu() : size(0), items(nullptr), prices(nullptr) {}
+
     Menu(int size, string *menuItems, double *menuPrices) : size(size)
     {
-        this->items = new string[size];
-        this->prices = new double[size];
+        items = new string[size];
+        prices = new double[size];
         for (int i = 0; i < size; i++)
         {
-            this->items[i] = menuItems[i];
-            this->prices[i] = menuPrices[i];
+            items[i] = menuItems[i];
+            prices[i] = menuPrices[i];
         }
     }
-    void setMenuItems(string *items, double *prices, int size)
+
+    ~Menu()
     {
-        this->items = items;
-        this->prices = prices;
-        this->size = size;
+        delete[] items;
+        delete[] prices;
     }
+
+    Menu(const Menu &other)
+    {
+        size = other.size;
+        items = new string[size];
+        prices = new double[size];
+        for (int i = 0; i < size; i++)
+        {
+            items[i] = other.items[i];
+            prices[i] = other.prices[i];
+        }
+    }
+
+    Menu &operator=(const Menu &other)
+    {
+        if (this != &other)
+        {
+            delete[] items;
+            delete[] prices;
+            size = other.size;
+            items = new string[size];
+            prices = new double[size];
+            for (int i = 0; i < size; i++)
+            {
+                items[i] = other.items[i];
+                prices[i] = other.prices[i];
+            }
+        }
+        return *this;
+    }
+
     void displayMenu() const
     {
         for (int i = 0; i < size; i++)
         {
-            cout << items[i] << " - Rs/" << prices[i] << endl;
+            cout << i + 1 << ". " << items[i] << " - Rs/" << prices[i] << endl;
+        }
+    }
+
+    // Getter functions
+    int getSize() const
+    {
+        return size;
+    }
+
+    const string &getItem(int index) const
+    {
+        if (index >= 0 && index < size)
+        {
+            return items[index];
+        }
+        else
+        {
+            static const string empty = "Invalid index";
+            return empty;
         }
     }
 };
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class Shop
 {
 protected:
     string name;
     Menu *menu;
-    int menuSize;
 
 public:
-    Shop(const string &name) : name(name) {}
-    virtual ~Shop() {}
+    Shop(const string &name) : name(name), menu(nullptr) {}
+
+    virtual ~Shop()
+    {
+        delete menu;
+    }
+
+    virtual void placeOrder(){}
+
+    void setMenu(int size, string *menuItems, double *menuPrices)
+    {
+        delete menu; // Clean up existing menu before setting a new one
+        menu = new Menu(size, menuItems, menuPrices);
+    }
+
+    void displayMenu()
+    {
+        if (menu)
+        {
+            menu->displayMenu();
+        }
+    }
 };
 
 class ShawarmaShop : public Shop
@@ -181,8 +265,25 @@ class ShawarmaShop : public Shop
 public:
     ShawarmaShop(string *menuItems, double *menuPrices, int size) : Shop("Shawarma Shop")
     {
-        menu = new Menu(size, menuItems, menuPrices);
-        menu->displayMenu();
+        setMenu(size, menuItems, menuPrices);
+    }
+
+    void placeOrder() override
+    {
+        displayMenu();
+        cout << "Enter the number of the item you want to order: ";
+        int choice;
+        cin >> choice;
+        const int menuSize = menu->getSize(); // Use the getter for size
+        if (choice > 0 && choice <= menuSize)
+        {
+            cout << "Order placed for " << menu->getItem(choice - 1) << " at Shawarma Shop" << endl
+                 << "Thank you for ordering!" << endl;
+        }
+        else
+        {
+            cout << "Invalid choice!" << endl;
+        }
     }
 };
 class PizzaFast : public Shop
@@ -190,17 +291,51 @@ class PizzaFast : public Shop
 public:
     PizzaFast(string *menuItems, double *menuPrices, int size) : Shop("Pizza Fast")
     {
-        menu->setMenuItems(menuItems, menuPrices, size);
-        menu->displayMenu();
+        setMenu(size, menuItems, menuPrices);
     }
+
+    void placeOrder() override
+{
+    displayMenu();
+    cout << "Enter the number of the item you want to order: ";
+    int choice;
+    cin >> choice;
+    const int menuSize = menu->getSize(); // Use the getter for size
+    if (choice > 0 && choice <= menuSize)
+    {
+        cout << "Order placed for " << menu->getItem(choice - 1) << " at Dhaba" << endl
+             << "Thank you for ordering!" << endl;
+    }
+    else
+    {
+        cout << "Invalid choice!" << endl;
+    }
+}
 };
 class Dhaba : public Shop
 {
 public:
     Dhaba(string *menuItems, double *menuPrices, int size) : Shop("Dhaba")
     {
-        menu = new Menu(size, menuItems, menuPrices);
-        menu->displayMenu();
+        setMenu(size, menuItems, menuPrices);
+    }
+
+    void placeOrder() override
+    {
+        displayMenu();
+        cout << "Enter the number of the item you want to order: ";
+        int choice;
+        cin >> choice;
+        const int menuSize = menu->getSize(); // Use the getter for size
+        if (choice > 0 && choice <= menuSize)
+        {
+            cout << "Order placed for " << menu->getItem(choice - 1) << " at Dhaba" << endl
+                 << "Thank you for ordering!" << endl;
+        }
+        else
+        {
+            cout << "Invalid choice!" << endl;
+        }
     }
 };
 class JuiceShop : public Shop
@@ -208,17 +343,51 @@ class JuiceShop : public Shop
 public:
     JuiceShop(string *menuItems, double *menuPrices, int size) : Shop("Juice Shop")
     {
-        menu = new Menu(size, menuItems, menuPrices);
-        menu->displayMenu();
+        setMenu(size, menuItems, menuPrices);
+    }
+
+    void placeOrder() override
+    {
+        displayMenu();
+        cout << "Enter the number of the item you want to order: ";
+        int choice;
+        cin >> choice;
+        const int menuSize = menu->getSize(); // Use the getter for size
+        if (choice > 0 && choice <= menuSize)
+        {
+            cout << "Order placed for " << menu->getItem(choice - 1) << " at Juice Shop" << endl
+                 << "Thank you for ordering!" << endl;
+        }
+        else
+        {
+            cout << "Invalid choice!" << endl;
+        }
     }
 };
 class SodaShop : public Shop
-{
+{   
 public:
     SodaShop(string *menuItems, double *menuPrices, int size) : Shop("Soda Shop")
     {
-        menu = new Menu(size, menuItems, menuPrices);
-        menu->displayMenu();
+        setMenu(size, menuItems, menuPrices);
+    }
+
+    void placeOrder() override
+    {
+        displayMenu();
+        cout << "Enter the number of the item you want to order: ";
+        int choice;
+        cin >> choice;
+        const int menuSize = menu->getSize(); // Use the getter for size
+        if (choice > 0 && choice <= menuSize)
+        {
+            cout << "Order placed for " << menu->getItem(choice - 1) << " at Soda Shop" << endl
+                 << "Thank you for ordering!" << endl;
+        }
+        else
+        {
+            cout << "Invalid choice!" << endl;
+        }
     }
 };
 class Cafeteria : public Shop
@@ -226,8 +395,25 @@ class Cafeteria : public Shop
 public:
     Cafeteria(string *menuItems, double *menuPrices, int size) : Shop("Cafeteria")
     {
-        menu = new Menu(size, menuItems, menuPrices);
-        menu->displayMenu();
+        setMenu(size, menuItems, menuPrices);
+    }
+
+    void placeOrder() override
+    {
+        displayMenu();
+        cout << "Enter the number of the item you want to order: ";
+        int choice;
+        cin >> choice;
+        const int menuSize = menu->getSize(); // Use the getter for size
+        if (choice > 0 && choice <= menuSize)
+        {
+            cout << "Order placed for " << menu->getItem(choice - 1) << " at Cafeteria" << endl
+                 << "Thank you for ordering!" << endl;
+        }
+        else
+        {
+            cout << "Invalid choice!" << endl;
+        }
     }
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -285,9 +471,11 @@ int main()
         cin >> locationChoice;
         if (locationChoice == 1)
         {
+            CSBuilding cs;
+            cs.displayFloors();
             cout << "Enter the floor name: ";
             cin >> floorName;
-            CSBuilding cs("CS Building", floorName);
+            CSBuilding CSBuilding("CS Building", floorName);
             Student s(name, &cs);
             s.placeOrder();
 
@@ -298,45 +486,54 @@ int main()
                  << "4. Juice Shop" << endl
                  << "5. Soda/shake Shop" << endl
                  << "6. Cafeteria" << endl;
-            cout << "Enter the Shop Name: " << endl;
+            cout << "Enter the Shop Name: ";
             cin >> shopchoice;
             if (shopchoice == 1)
             {
                 string menuItems[] = {"chicken Shawarma", "Zinger Shawarma", "Zinger Cheese Shawarma", "Chicken Mayo Shawarma", "Chicken Cheese Shawarma"};
                 double menuPrices[] = {150, 200, 250, 160, 170};
                 ShawarmaShop ss(menuItems, menuPrices, 5);
-                
+                ss.placeOrder();
+                CSBuilding.describe();
             }
             else if (shopchoice == 2)
             {
-                string menuItems[] = {"Fries(small)", "Fries(regular)", "box patties", "samosa", "shami burger", "spring roll", "Cold Drinks", "Juice", "Water Bottle" };
+                string menuItems[] = {"Fries(small)", "Fries(regular)", "Box Patties", "Samosa", "Shami Burger", "Spring Roll", "Cold Drinks", "Juice", "Water Bottle"};
                 double menuPrices[] = {50, 100, 70, 10, 100, 50, 80, 60, 50};
                 PizzaFast pf(menuItems, menuPrices, 9);
+                pf.placeOrder();
+                CSBuilding.describe(); // Assuming you want to describe the CSBuilding again
             }
             else if (shopchoice == 3)
             {
-                string menuItems[] = {"Fries(small)", "Fries(regular)", "Chicken Biryani", "Beef Biryani", "Veg Biryani"};
-                double menuPrices[] = {200, 250, 300, 150};
-                Dhaba d(menuItems, menuPrices, 4);
+                string menuItems[] = {"Fries(small)", "Fries(regular)", "Chicken Biryani", "Beef Biryani", "Veg Biryani", "Mutton Biryani"};
+                double menuPrices[] = {50, 100, 150, 180, 120, 200};
+                Dhaba d(menuItems, menuPrices, 6);
+                d.placeOrder();
+                CSBuilding.describe();
             }
             else if (shopchoice == 4)
             {
                 string menuItems[] = {"Apple Juice", "Peach Juice", "Blue Berry", "Orange Juice", "Mango Juice", "Strawberry Juice", "Pineapple Juice", "Watermelon Juice", "Banana Juice"};
                 double menuPrices[] = {50, 60, 70, 40, 80, 90, 100, 30, 20};
                 JuiceShop js(menuItems, menuPrices, 9);
+                js.placeOrder();
+                CSBuilding.describe();
             }
             else if (shopchoice == 5)
             {
-                string menuItems[] = {"Soda", "Coke", "Pepsi", "Sprite"};
-                double menuPrices[] = {30, 40, 50, 20};
-                SodaShop ss(menuItems, menuPrices, 4);
+                string menuItems[] = {"Soda", "Coke", "Pepsi", "Sprite", "Fanta"};
+                double menuPrices[] = {30, 40, 50, 20, 25};
+                SodaShop ss(menuItems, menuPrices, 5);
+                ss.placeOrder();
+                CSBuilding.describe();
             }
             else if (shopchoice == 6)
             {
-                string menuItems[] = {"Lemonade", "Hot Coffee", "Cold Coffee", "Lemonade+fizzup"};
+                string menuItems[] = {"Lemonade", "Hot Coffee", "Cold Coffee", "Lemonade+FizzUp"};
                 double menuPrices[] = {20, 30, 40, 50};
                 Cafeteria c(menuItems, menuPrices, 4);
-            }
+        }
         }
         else if (locationChoice == 2)
         {
@@ -369,6 +566,7 @@ int main()
             cout << "Enter the sports area name: ";
             SportsArea sa;
             Student s(name, &sa);
+            s.placeOrder();
         }
     }
 }

@@ -262,6 +262,8 @@ public:
     virtual ~User() {}
     friend ostream &operator<<(ostream &os, const Student &e);
     friend istream &operator>>(istream &is, Student &e);
+    friend ostream &operator<<(ostream &os, const Faculty &e);
+    friend istream &operator>>(istream &is, Faculty &e);
 };
 
 class Student : public User
@@ -296,11 +298,16 @@ istream &operator>>(istream &is, Student &e)
 }
 class Faculty : public User
 {
+    protected:
     int extentionNumber;
     string officeLocation;
 
 public:
+    Faculty(){}
     Faculty(const string &name, int extensionNumber, string officeLocation) : extentionNumber(extentionNumber), officeLocation(officeLocation), User(name) {}
+    string getLocation(){
+        return officeLocation;
+    }
     void describeUser() override
     {
         cout << "Faculty " << name << " placing an order from ";
@@ -1096,5 +1103,73 @@ int main()
                 cr.describe();
             }
         }
+    }else if(userchoice == 2){
+        Faculty f;
+        cin >> f;
+        cout << f;
+        do
+            {
+                cout << "Enter the Shop Choice i.e{1,2,3,4,5,6}: " << endl;
+                cout << "1. Shawarma Shop" << endl
+                     << "2. Pizza Fast" << endl
+                     << "3. Dhaba" << endl
+                     << "4. Juice Shop" << endl
+                     << "5. Soda Shop" << endl
+                     << "6. Cafeteria" << endl;
+                cin >> shopchoice;
+                if (shopchoice != 1 && shopchoice != 2 && shopchoice != 3 && shopchoice != 4 && shopchoice != 5 && shopchoice != 6)
+                {
+                    cout << "Invalid choice\nAgain" << endl;
+                }
+            } while (shopchoice != 1 && shopchoice != 2 && shopchoice != 3 && shopchoice != 4 && shopchoice != 5 && shopchoice != 6);
+
+            if (shopchoice == 1)
+            {
+                string menuItems[] = {"chicken Shawarma", "Zinger Shawarma", "Zinger Cheese Shawarma", "Chicken Mayo Shawarma", "Chicken Cheese Shawarma"};
+                double menuPrices[] = {150, 200, 250, 160, 170};
+                ShawarmaShop ss(menuItems, menuPrices, 5);
+                ss.placeOrder();
+                cout << f.getLocation();
+            }
+            else if (shopchoice == 2)
+            {
+                string menuItems[] = {"Fries(small)", "Fries(regular)", "Box Patties", "Samosa", "Shami Burger", "Spring Roll", "Cold Drinks", "Juice", "Water Bottle"};
+                double menuPrices[] = {50, 100, 70, 10, 100, 50, 80, 60, 50};
+                PizzaFast pf(menuItems, menuPrices, 9);
+                pf.placeOrder();
+                cout << f.getLocation();
+            }
+            else if (shopchoice == 3)
+            {
+                string menuItems[] = {"Fries(small)", "Fries(regular)", "Chicken Biryani", "Beef Biryani", "Veg Biryani", "Mutton Biryani"};
+                double menuPrices[] = {50, 100, 150, 180, 120, 200};
+                Dhaba d(menuItems, menuPrices, 6);
+                d.placeOrder();
+                cout << f.getLocation();
+            }
+            else if (shopchoice == 4)
+            {
+                string menuItems[] = {"Apple Juice", "Peach Juice", "Blue Berry", "Orange Juice", "Mango Juice", "Strawberry Juice", "Pineapple Juice", "Watermelon Juice", "Banana Juice"};
+                double menuPrices[] = {50, 60, 70, 40, 80, 90, 100, 30, 20};
+                JuiceShop js(menuItems, menuPrices, 9);
+                js.placeOrder();
+                cout << f.getLocation();
+            }
+            else if (shopchoice == 5)
+            {
+                string menuItems[] = {"Soda", "Coke", "Pepsi", "Sprite", "Fanta"};
+                double menuPrices[] = {30, 40, 50, 20, 25};
+                SodaShop ss(menuItems, menuPrices, 5);
+                ss.placeOrder();
+                cout << f.getLocation();
+            }
+            else if (shopchoice == 6)
+            {
+                string menuItems[] = {"Lemonade", "Hot Coffee", "Cold Coffee", "Lemonade+FizzUp"};
+                double menuPrices[] = {20, 30, 40, 50};
+                Cafeteria c(menuItems, menuPrices, 4);
+                c.placeOrder();
+                cout << f.getLocation();
+            }
     }
 }

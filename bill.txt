@@ -1,0 +1,6 @@
+Quantity: 1
+Item: chicken Shawarma
+Price: 150
+Total amount: 150
+Location: Shawarma Shop
+

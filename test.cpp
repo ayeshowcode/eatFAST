@@ -329,6 +329,7 @@ Location *Location::selectLocation()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class Student;
+class Faculty;
 class User
 {
 protected:
@@ -413,6 +414,62 @@ istream &operator>>(istream &is, Student &e)
         e.location = Location::selectLocation();
     return is;
 }
+class Faculty : public User
+{
+public:
+    Faculty() {}
+    Faculty(const string& name,const int ext, const string& officeLocation) : User(name), extensionNumber(ext), officeLocation(officeLocation) {}
+
+    void describeUser() override
+    {
+        cout << "Faculty " << name << " (Extension: " << extensionNumber << ") ordering from " << officeLocation << endl;
+    }
+
+    friend ostream& operator<<(ostream& os, const Faculty& f);
+    friend istream& operator>>(istream& is, Faculty& f);
+
+    string getName() const
+    {
+        return name;
+    }
+
+    int getExtensionNumber() const
+    {
+        return extensionNumber;
+    }
+
+    string getOfficeLocation() const
+    {
+        return officeLocation;
+    }
+
+private:
+    int extensionNumber;
+    string officeLocation;
+};
+
+ostream& operator<<(ostream& os, const Faculty& f)
+{
+    os << endl;
+    os << "-----------------------------------------------------------------" << endl;
+    os << "Faculty's name: " << f.name << endl;
+    os << "Faculty's Extension Number: " << f.extensionNumber << endl;
+    os << "Faculty's Office Location: " << f.officeLocation << endl;
+    return os;
+}
+
+istream& operator>>(istream& is, Faculty& f)
+{
+    cout << "Enter faculty's name: ";
+    getline(is, f.name);
+    cout << "Enter faculty's extension number: ";
+    is >> f.extensionNumber;
+    is.ignore(); // Ignore the newline character left in the input buffer
+    cout << "Enter faculty's office location: ";
+    getline(is, f.officeLocation);
+    return is;
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -550,6 +607,11 @@ public:
     {
         this->placeOrder();
         location.describe();
+    }
+    void processOrder(string location)
+    {
+        this->placeOrder();
+        cout << "Order placed at " << location << endl;
     }
     static void displayAllShops()
     {
@@ -1142,5 +1204,37 @@ int main()
         {
             cout << "Invalid location choice......" << endl;
         }
-    }
+    }else if (userchoice == 2)
+ {
+        string facultyName;
+        int extensionNumber;
+        string officeLocation;
+
+        cout << "Enter faculty name: ";
+    cin.ignore(); // Ignore the newline character left in the input buffer
+    getline(cin, facultyName);
+
+    cout << "Enter extension number: ";
+    cin >> extensionNumber;
+    cin.ignore(); // Ignore the newline character left in the input buffer
+
+    cout << "Enter office location: ";
+    getline(cin, officeLocation);
+
+Faculty f(facultyName, extensionNumber, officeLocation);
+f.describeUser();
+Shop::displayAllShops();
+int shopChoice = Shop::selectShop();
+
+Shop *shop = Shop::createShop(shopChoice);
+if (shop != nullptr)
+{   shop->processOrder(officeLocation);
+}
+else
+{
+    cout << "Invalid shop choice..." << endl;
+}
+
+}
+
 }

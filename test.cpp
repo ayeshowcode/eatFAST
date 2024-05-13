@@ -26,6 +26,8 @@ class Location
 {
 public:
     virtual void describe() = 0;
+    virtual string getBuildingName() = 0;
+    virtual string getBuildingFloorName() = 0;
     virtual ~Location() {}
     static void displayAllLocations()
     {
@@ -66,7 +68,7 @@ public:
     {
         this->buildingName = buildingName;
     }
-    string getBuildingName()
+    string getBuildingName() override
     {
         return buildingName;
     }
@@ -74,7 +76,7 @@ public:
     {
         floor.setFloorName(floorName);
     }
-    string getBuildingFloorName()
+    string getBuildingFloorName() override
     {
         return floor.getFloorName();
     }
@@ -118,7 +120,7 @@ public:
             }
         }
     }
-    void describe()
+    void describe() override
     {
         cout << "CS Building    " << "Floor: " << floor.getFloorName() << endl;
     }
@@ -132,7 +134,7 @@ public:
     {
         this->buildingName = buildingName;
     }
-    string getBuildingName()
+    string getBuildingName() override
     {
         return buildingName;
     }
@@ -140,7 +142,7 @@ public:
     {
         floor.setFloorName(floorName);
     }
-    string getBuildingFloorName()
+    string getBuildingFloorName() override
     {
         return floor.getFloorName();
     }
@@ -193,7 +195,7 @@ public:
             }
         }
     }
-    void describe()
+    void describe() override
     {
         cout << "EE Building" << endl
              << "floor: " << floor.getFloorName() << endl;
@@ -209,7 +211,7 @@ public:
     {
         this->buildingName = buildingName;
     }
-    string getBuildingName()
+    string getBuildingName() override
     {
         return buildingName;
     }
@@ -217,7 +219,7 @@ public:
     {
         floor.setFloorName(floorName);
     }
-    string getBuildingFloorName()
+    string getBuildingFloorName() override
     {
         return floor.getFloorName();
     }
@@ -262,6 +264,14 @@ public:
     {
         cout << " sports area." << endl;
     }
+    string getBuildingName() override
+    {
+        return "Sports Area";
+    }
+    string getBuildingFloorName() override
+    {
+        return "No Specific Floor";
+    }
 };
 class CommonRoom : public Location
 {
@@ -269,6 +279,14 @@ public:
     void describe() override
     {
         cout << "Common room for students." << endl;
+    }
+    string getBuildingName() override
+    {
+        return "Common Room";
+    }
+    string getBuildingFloorName() override
+    {
+        return "No Specific Floor";
     }
 };
 
@@ -279,11 +297,19 @@ public:
     {
         cout << "University auditorium." << endl;
     }
+    string getBuildingName() override
+    {
+        return "Auditorium";
+    }
+    string getBuildingFloorName() override
+    {
+        return "No Specific Floor";
+    }
 };
 Location *Location::selectLocation()
 {
     int locationChoice;
-    cout << "Select Location: 4 for Auditorium, 5 for Common Room, 6 for Multipurpose Building";
+    cout << "Select Location: 4 for Auditorium, 5 for Common Room, 6 for Multipurpose Building: ";
     cin >> locationChoice;
     switch (locationChoice)
     {
@@ -292,7 +318,7 @@ Location *Location::selectLocation()
     case 5:
         return new CommonRoom();
     case 6:
-        return new MultipurposeBuilding();
+        return new SportsArea();
     default:
         return nullptr;
     }
@@ -301,84 +327,71 @@ Location *Location::selectLocation()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class Student;
 class User
 {
 protected:
-    string name;
     Location *location;
+    string name;
+    string phoneNo;
+    string rollNo;
 
 public:
     User() {}
     User(const string &name) : name(name) {}
-    User(string name, Location *location) : name(name), location(location) {}
+    User(Location *location) : location(location) {}
     virtual void describeUser() = 0;
     virtual ~User() {}
-   //friend ostream &operator<<(ostream &os, const Student &e);
-   //friend istream &operator>>(istream &is, Student &e);
+    friend ostream &operator<<(ostream &os, const Student &e);
+    friend istream &operator>>(istream &is, Student &e);
 };
 
 class Student : public User
 {
-    double phoneNumber;
-
 public:
     Student() {}
-    Student(Location *location) : User(name, location), phoneNumber(phoneNumber) {}
+    Student(Location *location) : User(location) {}
     void describeUser() override
     {
         cout << "Student " << name << " placing an order from ";
         location->describe();
     }
-   // friend ostream &operator<<(ostream &os, const Student &e);
-   // friend istream &operator>>(istream &is, Student &e);
+    friend ostream &operator<<(ostream &os, const Student &e);
+    friend istream &operator>>(istream &is, Student &e);
 };
 
-// ostream &operator<<(ostream &os, const Student &e) // Overloading << operator
-// {
-//     os << "Student's name :" << e.name;
-//     os << "Student's Phone Number" << e.phoneNumber;
-//     os << "Student's Location" << e.location;
-//     return os;
-// }
-// istream &operator>>(istream &is, Student &e)
-// {
-//     cout << "Enter student's name: ";
-//     getline(is, e.name);
-//     cout << "Enter student's phone number: ";
-//     is >> e.phoneNumber;
-// }
-// class Faculty : public User
-// {
-//     int extentionNumber;
-//     string officeLocation;
+ostream &operator<<(ostream &os, const Student &e) // Overloading << operator
+{
+    os << endl; 
+    os<< "-----------------------------------------------------------------" << endl;
+    os << "Student's name :" << e.name << endl;
+    os << "Student's Roll No: " << e.rollNo << endl;
+    os << "Student's Phone No: " << e.phoneNo << endl;
 
-// public:
-//     Faculty(const string &name, int extensionNumber, string officeLocation) : extentionNumber(extentionNumber), officeLocation(officeLocation), User(name) {}
-//     void describeUser() override
-//     {
-//         cout << "Faculty " << name << " placing an order from ";
-//         location->describe();
-//     }
-//     friend ostream &operator<<(ostream &os, const Faculty &e);
-//     friend istream &operator>>(istream &is, Faculty &e);
-// };
+    if (e.location != nullptr)
+    {
+        os << "Student's Location" << e.location->getBuildingName();
+    }
+    return os;
+}
+istream &operator>>(istream &is, Student &e)
+{
+    cout << "Enter student's name: ";
+    getline(is, e.name);
+    cout << "Enter the student's roll No: " ;
+    getline(cin, e.rollNo);
+    cout << "Enter the student's phone No: " ;
+    getline(cin, e.phoneNo);
 
-// ostream &operator<<(ostream &os, const Faculty &e) // Overloading << operator
-// {
-//     os << "Teacher's name :" << e.name;
-//     os << "Teacher's Extension Number" << e.extentionNumber;
-//     os << "Teacher's Office location" << e.officeLocation;
-//     return os;
-// }
-// istream &operator>>(istream &is, Faculty &e)
-// {
-//     cout << "Enter Teacher's name: ";
-//     getline(is, e.name);
-//     cout << "Enter Teacher's Extention number: ";
-//     is >> e.extentionNumber;
-//     cout << "Enter Teacher's Location: ";
-//     getline(is, e.officeLocation);
-// }
+    int choice;
+    cout << "Choose 1 if you want to order from the building or 2 for some other location: " ;
+    cin >> choice;
+    if (choice==1)
+    e.location = Building::selectLocation();
+    else if (choice ==2)
+    e.location = Location::selectLocation();
+    return is;
+}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -422,23 +435,23 @@ public:
         }
     }
 
-    Menu &operator=(const Menu &other)
-    {
-        if (this != &other)
-        {
-            delete[] items;
-            delete[] prices;
-            size = other.size;
-            items = new string[size];
-            prices = new double[size];
-            for (int i = 0; i < size; i++)
-            {
-                items[i] = other.items[i];
-                prices[i] = other.prices[i];
-            }
-        }
-        return *this;
-    }
+    // Menu &operator=(const Menu &other)
+    // {
+    //     if (this != &other)
+    //     {
+    //         delete[] items;
+    //         delete[] prices;
+    //         size = other.size;
+    //         items = new string[size];
+    //         prices = new double[size];
+    //         for (int i = 0; i < size; i++)
+    //         {
+    //             items[i] = other.items[i];
+    //             prices[i] = other.prices[i];
+    //         }
+    //     }
+    //     return *this;
+    // }
 
     void displayMenu() const
     {
@@ -600,6 +613,7 @@ public:
         }
     }
 };
+
 class JuiceShop : public Shop
 {
 public:
@@ -772,8 +786,7 @@ int main()
 
     if (userchoice == 1)
     {
-       
-
+        
         Location::displayAllLocations();
         cout << "you want to order from the building or the other location: ";
         cin >> locationChoice;
@@ -787,6 +800,10 @@ int main()
                 string floorName = building->selectFloor();
 
                 Student s(building);
+                cout << "Enter the details:  " << endl;
+                cin.ignore();
+                cin >> s;
+                
                 s.describeUser();
                 Shop::displayAllShops();
                 int shopChoice = Shop::selectShop();
@@ -800,7 +817,7 @@ int main()
                 {
                     cout << "Invalid shop choice......" << endl;
                 }
-                delete location; // Don't forget to delete the location pointer when you're done with it
+                delete building;
             }
             else
             {
@@ -810,12 +827,12 @@ int main()
 
         else if (locationChoice == 2)
         {
-            location = Location::selectLocation();
+           // location = Location::selectLocation();
             if (location != nullptr)
             {
-                Student s(location);
-                //cout << "Enter the details:  "<< endl;
-                //cin>> s;
+                Student s;
+                cout << "Enter the details:  " << endl;
+               cin >> s;
                 s.describeUser();
                 Shop::displayAllShops();
                 int shopChoice = Shop::selectShop();
@@ -824,12 +841,14 @@ int main()
                 if (shop != nullptr)
                 {
                     shop->processOrder(*location);
+                    delete location;
                 }
                 else
                 {
                     cout << "Invalid shop choice......" << endl;
+                    delete location;
                 }
-                delete location; // Don't forget to delete the location pointer when you're done with it
+               // delete location; // Don't forget to delete the location pointer when you're done with it
             }
             else
             {

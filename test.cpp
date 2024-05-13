@@ -250,32 +250,76 @@ protected:
     Location *location;
 
 public:
+    User() {} 
+    User(const string &name):name(name) {} 
     User(const string &name, Location *location) : name(name), location(location) {}
     virtual void describeUser() = 0;
     virtual ~User() {}
+friend ostream &operator<<( ostream &os, const Student &e );
+friend istream &operator>>( istream &is, Student &e );
 };
 
 class Student : public User
 {
+    double phoneNumber;
 public:
-    Student(const string &name, Location *location) : User(name, location) {}
+    Student(){}
+    Student(const string &name, Location *location, double phoneNumber) : User(name, location) ,phoneNumber(phoneNumber) {}
     void describeUser() override
     {
         cout << "Student " << name << " placing an order from ";
         location->describe();
     }
+friend ostream &operator<<( ostream &os, const Student &e );
+friend istream &operator>>( istream &is, Student &e );
+
 };
 
+ostream& operator<<(ostream& os, const Student& e) //Overloading << operator
+{
+    os <<"Student's name :" << e.name;
+    os <<"Student's Phone Number"<< e.phoneNumber;
+    os <<"Student's Location" << e.location;
+return os;
+}
+istream &operator>>(istream &is, Student &e) {
+    cout << "Enter student's name: ";
+    getline(is, e.name);
+    cout << "Enter student's phone number: ";
+    is >> e.phoneNumber;
+}
 class Faculty : public User
 {
+    int extentionNumber;
+    string officeLocation;
+
 public:
-    Faculty(const string &name, Location *location) : User(name, location) {}
+    Faculty(const string &name, int extensionNumber,string officeLocation) :extentionNumber(extentionNumber),officeLocation(officeLocation) ,User(name) {}
     void describeUser() override
     {
         cout << "Faculty " << name << " placing an order from ";
         location->describe();
     }
+friend ostream &operator<<( ostream &os, const Faculty &e );
+friend istream &operator>>( istream &is, Faculty &e );
+
 };
+
+ostream& operator<<(ostream& os, const Faculty& e) //Overloading << operator
+{
+    os <<"Teacher's name :" << e.name;
+    os <<"Teacher's Extension Number"<< e.extentionNumber;
+    os <<"Teacher's Office location" << e.officeLocation;
+return os;
+}
+istream &operator>>(istream &is, Faculty &e) {
+    cout << "Enter Teacher's name: ";
+    getline(is, e.name);
+    cout << "Enter Teacher's Extention number: ";
+    is >> e.extentionNumber;
+    cout << "Enter Teacher's Location: ";
+    getline(is, e.officeLocation);
+}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -642,7 +686,8 @@ int main()
             string floorName = cs.selectFloor();
             cs.setBuildingName("CS Building");
             cs.setFloorName(floorName);
-            Student s(name, &cs);
+            Student s;
+            cin >> s;
             s.describeUser();
             do
             {
@@ -715,7 +760,8 @@ int main()
             string floorName = ee.selectFloor();
             ee.setBuildingName("EE Building");
             ee.setFloorName(floorName);
-            Student s(name, &ee);
+            Student s;
+            cin >> s;
             s.describeUser();
             do
             {
@@ -787,7 +833,8 @@ int main()
             string floorName = mp.selectFloor();
             mp.setBuildingName("Multipurpose Building");
             mp.setFloorName(floorName);
-            Student s(name, &mp);
+            Student s;
+            cin >> s;
             s.describeUser();
             do
             {
@@ -856,7 +903,8 @@ int main()
         else if (locationChoice == 4)
         {
             SportsArea sa;
-            Student s(name, &sa);
+            Student s;
+            cin >> s;
             s.describeUser();
             do
             {
@@ -922,7 +970,8 @@ int main()
         else if (locationChoice == 5)
         {
             Auditorium a;
-            Student s(name, &a);
+            Student s;
+            cin >> s;
             s.describeUser();
             do
             {
@@ -974,7 +1023,8 @@ int main()
         else if (locationChoice == 6)
         {
             CommonRoom cr;
-            Student s(name, &cr);
+            Student s;
+            cin >> s;
             s.describeUser();
             do
             {

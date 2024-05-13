@@ -27,6 +27,16 @@ class Location
 public:
     virtual void describe() = 0;
     virtual ~Location() {}
+    static void displayAllLocations()
+    {
+        cout << "1. CS Building" << endl
+             << "2. EE Building" << endl
+             << "3. Multipurpose Building" << endl
+             << "4. Sports Area" << endl
+             << "5. Auditorium" << endl
+             << "6. Common Room" << endl;
+    }
+    static Location *selectLocation();
 };
 
 class Building : public Location
@@ -45,6 +55,7 @@ public:
     {
         cout << "Building: " << buildingName << ", Floor: " << floor.getFloorName() << endl;
     }
+    static Building *selectLocation();
 };
 class CSBuilding : public Building
 {
@@ -59,7 +70,7 @@ public:
     {
         return buildingName;
     }
-    void setFloorName(string floorName)
+    void setBuildingFloorName(string floorName)
     {
         floor.setFloorName(floorName);
     }
@@ -224,8 +235,26 @@ public:
     {
         cout << "Multipurpose Building" << endl;
     }
-
 };
+Building *Building ::selectLocation()
+{
+    int choice;
+    cout << "Select a building (1 for CS Building, 2 for EE Building, 3 for Multipurpose Building): ";
+    cin >> choice;
+
+    switch (choice)
+    {
+    case 1:
+        return new CSBuilding(); // Assuming CSBuilding is a subclass of Building
+    case 2:
+        return new EEBuilding(); // Assuming EEBuilding is a subclass of Building
+    case 3:
+        return new MultipurposeBuilding(); // Assuming MultipurposeBuilding is a subclass of Building
+    default:
+        cout << "Invalid choice. Please select a valid building.";
+        return nullptr;
+    }
+}
 class SportsArea : public Location
 {
 public:
@@ -251,6 +280,23 @@ public:
         cout << "University auditorium." << endl;
     }
 };
+Location *Location::selectLocation()
+{
+    int locationChoice;
+    cout << "Select Location: 4 for Auditorium, 5 for Common Room, 6 for Multipurpose Building";
+    cin >> locationChoice;
+    switch (locationChoice)
+    {
+    case 4:
+        return new Auditorium();
+    case 5:
+        return new CommonRoom();
+    case 6:
+        return new MultipurposeBuilding();
+    default:
+        return nullptr;
+    }
+}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -262,32 +308,77 @@ protected:
     Location *location;
 
 public:
-    User(const string &name, Location *location) : name(name), location(location) {}
+    User() {}
+    User(const string &name) : name(name) {}
+    User(string name, Location *location) : name(name), location(location) {}
     virtual void describeUser() = 0;
     virtual ~User() {}
+    friend ostream &operator<<(ostream &os, const Student &e);
+    friend istream &operator>>(istream &is, Student &e);
 };
 
 class Student : public User
 {
+    double phoneNumber;
+
 public:
-    Student(const string &name, Location *location) : User(name, location) {}
+    Student() {}
+    Student(Location *location) : User(name, location), phoneNumber(phoneNumber) {}
     void describeUser() override
     {
         cout << "Student " << name << " placing an order from ";
         location->describe();
     }
+    friend ostream &operator<<(ostream &os, const Student &e);
+    friend istream &operator>>(istream &is, Student &e);
 };
 
+ostream &operator<<(ostream &os, const Student &e) // Overloading << operator
+{
+    os << "Student's name :" << e.name;
+    os << "Student's Phone Number" << e.phoneNumber;
+    os << "Student's Location" << e.location;
+    return os;
+}
+istream &operator>>(istream &is, Student &e)
+{
+    cout << "Enter student's name: ";
+    getline(is, e.name);
+    cout << "Enter student's phone number: ";
+    is >> e.phoneNumber;
+}
 class Faculty : public User
 {
+    int extentionNumber;
+    string officeLocation;
+
 public:
-    Faculty(const string &name, Location *location) : User(name, location) {}
+    Faculty(const string &name, int extensionNumber, string officeLocation) : extentionNumber(extentionNumber), officeLocation(officeLocation), User(name) {}
     void describeUser() override
     {
         cout << "Faculty " << name << " placing an order from ";
         location->describe();
     }
+    friend ostream &operator<<(ostream &os, const Faculty &e);
+    friend istream &operator>>(istream &is, Faculty &e);
 };
+
+ostream &operator<<(ostream &os, const Faculty &e) // Overloading << operator
+{
+    os << "Teacher's name :" << e.name;
+    os << "Teacher's Extension Number" << e.extentionNumber;
+    os << "Teacher's Office location" << e.officeLocation;
+    return os;
+}
+istream &operator>>(istream &is, Faculty &e)
+{
+    cout << "Enter Teacher's name: ";
+    getline(is, e.name);
+    cout << "Enter Teacher's Extention number: ";
+    is >> e.extentionNumber;
+    cout << "Enter Teacher's Location: ";
+    getline(is, e.officeLocation);
+}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -406,8 +497,31 @@ public:
             menu->displayMenu();
         }
     }
-};
 
+    static Shop *createShop(int shopChoice);
+
+    void processOrder(Location &location)
+    {
+        this->placeOrder();
+        location.describe();
+    }
+    static void displayAllShops()
+    {
+        cout << "1. Shawarma Shop" << endl
+             << "2. Pizza Fast" << endl
+             << "3. Dhaba" << endl
+             << "4. Juice Shop" << endl
+             << "5. Soda Shop" << endl
+             << "6. Cafeteria" << endl;
+    }
+    static int selectShop()
+    {
+        int shopChoice;
+        cout << "Enter the Shop Choice: ";
+        cin >> shopChoice;
+        return shopChoice;
+    }
+};
 class ShawarmaShop : public Shop
 {
 public:
@@ -564,6 +678,59 @@ public:
         }
     }
 };
+
+Shop *Shop::createShop(int shopChoice)
+{
+    switch (shopChoice)
+    {
+    case 1:
+    {
+        string menuItems[] = {"chicken Shawarma", "Zinger Shawarma", "Zinger Cheese Shawarma", "Chicken Mayo Shawarma", "Chicken Cheese Shawarma"};
+        double menuPrices[] = {150, 200, 250, 160, 170};
+        return new ShawarmaShop(menuItems, menuPrices, 5);
+    }
+
+    case 2:
+    {
+        string menuItems[] = {"Fries(small)", "Fries(regular)", "Box Patties", "Samosa", "Shami Burger", "Spring Roll", "Cold Drinks", "Juice", "Water Bottle"};
+        double menuPrices[] = {50, 100, 70, 10, 100, 50, 80, 60, 50};
+        return new PizzaFast(menuItems, menuPrices, 9);
+    }
+
+    case 3:
+    {
+        // Add more cases as needed for other shop choices
+        string menuItems[] = {"Fries(small)", "Fries(regular)", "Chicken Biryani", "Beef Biryani", "Veg Biryani", "Mutton Biryani"};
+        double menuPrices[] = {50, 100, 150, 180, 120, 200};
+        return new Dhaba(menuItems, menuPrices, 6);
+    }
+
+    case 4:
+    {
+        string menuItems[] = {"Apple Juice", "Peach Juice", "Blue Berry", "Orange Juice", "Mango Juice", "Strawberry Juice", "Pineapple Juice", "Watermelon Juice", "Banana Juice"};
+        double menuPrices[] = {50, 60, 70, 40, 80, 90, 100, 30, 20};
+        return new JuiceShop(menuItems, menuPrices, 9);
+    }
+
+    case 5:
+    {
+        string menuItems[] = {"Soda", "Coke", "Pepsi", "Sprite", "Fanta"};
+        double menuPrices[] = {30, 40, 50, 20, 25};
+        return new SodaShop(menuItems, menuPrices, 5);
+    }
+
+    case 6:
+    {
+        string menuItems[] = {"Lemonade", "Hot Coffee", "Cold Coffee", "Lemonade+FizzUp"};
+        double menuPrices[] = {20, 30, 40, 50};
+        return new Cafeteria(menuItems, menuPrices, 4);
+    }
+
+    default:
+        cout << "Invalid shop choice." << endl;
+        return nullptr;
+    }
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -586,7 +753,6 @@ class PickupService : public Service
 public:
     PickupService() : Service("Pickup Service") {}
 };
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -599,383 +765,80 @@ int main()
          << "2. Faculty" << endl;
     int userchoice;
     cin >> userchoice;
-    string name;
+    string name = "default";
     string buildingName;
     string floorName;
     int locationChoice;
-    int shopchoice;
 
     if (userchoice == 1)
     {
-        // cout << "Enter your Name: ";
-        //  getline(cin, name);
-        cout << "1. CS Building" << endl
-             << "2. EE Building " << endl
-             << "3. Multipurpose Building" << endl
-             << "4. Sports Area" << endl
-             << "5. Auditoriam" << endl
-             << "6. Common Room" << endl;
-        cout << "Select Location: ";
+       
+
+        Location::displayAllLocations();
+        cout << "you want to order from the building or the other location: ";
         cin >> locationChoice;
+        Building *building;
+        Location *location;
         if (locationChoice == 1)
         {
-            CSBuilding cs;
-            string floorName = cs.selectFloor();
-            cs.setBuildingName("CS Building");
-            cs.setFloorName(floorName);
-            Student s(name, &cs);
-            s.describeUser();
-            cout << "1. Shawarma Shop" << endl
-                 << "2. Pizza Fast" << endl
-                 << "3. Dhaba" << endl
-                 << "4. Juice Shop" << endl
-                 << "5. Soda Shop" << endl
-                 << "6. Cafeteria" << endl;
-            cout << "Enter the Shop Choice: ";
-            cin >> shopchoice;
-            if (shopchoice == 1)
+            building = Building::selectLocation();
+            if (building != nullptr)
             {
-                string menuItems[] = {"chicken Shawarma", "Zinger Shawarma", "Zinger Cheese Shawarma", "Chicken Mayo Shawarma", "Chicken Cheese Shawarma"};
-                double menuPrices[] = {150, 200, 250, 160, 170};
-                ShawarmaShop ss(menuItems, menuPrices, 5);
-                ss.placeOrder();
-                cs.describe();
+                string floorName = building->selectFloor();
+
+                Student s(building);
+                s.describeUser();
+                Shop::displayAllShops();
+                int shopChoice = Shop::selectShop();
+
+                Shop *shop = Shop::createShop(shopChoice);
+                if (shop != nullptr)
+                {
+                    shop->processOrder(*location);
+                }
+                else
+                {
+                    cout << "Invalid shop choice......" << endl;
+                }
+                delete location; // Don't forget to delete the location pointer when you're done with it
             }
-            else if (shopchoice == 2)
+            else
             {
-                string menuItems[] = {"Fries(small)", "Fries(regular)", "Box Patties", "Samosa", "Shami Burger", "Spring Roll", "Cold Drinks", "Juice", "Water Bottle"};
-                double menuPrices[] = {50, 100, 70, 10, 100, 50, 80, 60, 50};
-                PizzaFast pf(menuItems, menuPrices, 9);
-                pf.placeOrder();
-                cs.describe(); // Assuming you want to describe the CSBuilding again
-            }
-            else if (shopchoice == 3)
-            {
-                string menuItems[] = {"Fries(small)", "Fries(regular)", "Chicken Biryani", "Beef Biryani", "Veg Biryani", "Mutton Biryani"};
-                double menuPrices[] = {50, 100, 150, 180, 120, 200};
-                Dhaba d(menuItems, menuPrices, 6);
-                d.placeOrder();
-                cs.describe();
-            }
-            else if (shopchoice == 4)
-            {
-                string menuItems[] = {"Apple Juice", "Peach Juice", "Blue Berry", "Orange Juice", "Mango Juice", "Strawberry Juice", "Pineapple Juice", "Watermelon Juice", "Banana Juice"};
-                double menuPrices[] = {50, 60, 70, 40, 80, 90, 100, 30, 20};
-                JuiceShop js(menuItems, menuPrices, 9);
-                js.placeOrder();
-                cs.describe();
-            }
-            else if (shopchoice == 5)
-            {
-                string menuItems[] = {"Soda", "Coke", "Pepsi", "Sprite", "Fanta"};
-                double menuPrices[] = {30, 40, 50, 20, 25};
-                SodaShop ss(menuItems, menuPrices, 5);
-                ss.placeOrder();
-                cs.describe();
-            }
-            else if (shopchoice == 6)
-            {
-                string menuItems[] = {"Lemonade", "Hot Coffee", "Cold Coffee", "Lemonade+FizzUp"};
-                double menuPrices[] = {20, 30, 40, 50};
-                Cafeteria c(menuItems, menuPrices, 4);
-                c.placeOrder();
-                cs.describe();
+                cout << "Invalid location choice......" << endl;
             }
         }
+
         else if (locationChoice == 2)
         {
-            EEBuilding ee;
-            string floorName = ee.selectFloor();
-            ee.setBuildingName("EE Building");
-            ee.setFloorName(floorName);
-            Student s(name, &ee);
-            s.describeUser();
-            cout << "1. Shawarma Shop" << endl
-                 << "2. Pizza Fast" << endl
-                 << "3. Dhaba" << endl
-                 << "4. Juice Shop" << endl
-                 << "5. Soda Shop" << endl
-                 << "6. Cafeteria" << endl;
-            cout << "Enter the Shop Choice: ";
-            cin >> shopchoice;
-            if (shopchoice == 1)
+            location = Location::selectLocation();
+            if (location != nullptr)
             {
-                string menuItems[] = {"chicken Shawarma", "Zinger Shawarma", "Zinger Cheese Shawarma", "Chicken Mayo Shawarma", "Chicken Cheese Shawarma"};
-                double menuPrices[] = {150, 200, 250, 160, 170};
-                ShawarmaShop ss(menuItems, menuPrices, 5);
-                ss.placeOrder();
-                ee.describe();
+                Student s(location);
+                cout << "Enter the details:  "<< endl;
+                cin>> s;
+                s.describeUser();
+                Shop::displayAllShops();
+                int shopChoice = Shop::selectShop();
+
+                Shop *shop = Shop::createShop(shopChoice);
+                if (shop != nullptr)
+                {
+                    shop->processOrder(*location);
+                }
+                else
+                {
+                    cout << "Invalid shop choice......" << endl;
+                }
+                delete location; // Don't forget to delete the location pointer when you're done with it
             }
-            else if (shopchoice == 2)
+            else
             {
-                string menuItems[] = {"Fries(small)", "Fries(regular)", "Box Patties", "Samosa", "Shami Burger", "Spring Roll", "Cold Drinks", "Juice", "Water Bottle"};
-                double menuPrices[] = {50, 100, 70, 10, 100, 50, 80, 60, 50};
-                PizzaFast pf(menuItems, menuPrices, 9);
-                pf.placeOrder();
-                ee.describe(); // Assuming you want to describe the CSBuilding again
-            }
-            else if (shopchoice == 3)
-            {
-                string menuItems[] = {"Fries(small)", "Fries(regular)", "Chicken Biryani", "Beef Biryani", "Veg Biryani", "Mutton Biryani"};
-                double menuPrices[] = {50, 100, 150, 180, 120, 200};
-                Dhaba d(menuItems, menuPrices, 6);
-                d.placeOrder();
-                ee.describe();
-            }
-            else if (shopchoice == 4)
-            {
-                string menuItems[] = {"Apple Juice", "Peach Juice", "Blue Berry", "Orange Juice", "Mango Juice", "Strawberry Juice", "Pineapple Juice", "Watermelon Juice", "Banana Juice"};
-                double menuPrices[] = {50, 60, 70, 40, 80, 90, 100, 30, 20};
-                JuiceShop js(menuItems, menuPrices, 9);
-                js.placeOrder();
-                ee.describe();
-            }
-            else if (shopchoice == 5)
-            {
-                string menuItems[] = {"Soda", "Coke", "Pepsi", "Sprite", "Fanta"};
-                double menuPrices[] = {30, 40, 50, 20, 25};
-                SodaShop ss(menuItems, menuPrices, 5);
-                ss.placeOrder();
-                ee.describe();
-            }
-            else if (shopchoice == 6)
-            {
-                string menuItems[] = {"Lemonade", "Hot Coffee", "Cold Coffee", "Lemonade+FizzUp"};
-                double menuPrices[] = {20, 30, 40, 50};
-                Cafeteria c(menuItems, menuPrices, 4);
-                c.placeOrder();
-                ee.describe();
+                cout << "Invalid location choice......" << endl;
             }
         }
-            else if (locationChoice == 3)
-            {
-                MultipurposeBuilding mp;
-                string floorName = mp.selectFloor();
-                mp.setBuildingName("Multipurpose Building");
-                mp.setFloorName(floorName);
-                Student s(name, &mp);
-                s.describeUser();
-                cout << "1. Shawarma Shop" << endl
-                     << "2. Pizza Fast" << endl
-                     << "3. Dhaba" << endl
-                     << "4. Juice Shop" << endl
-                     << "5. Soda Shop" << endl
-                     << "6. Cafeteria" << endl;
-                cout << "Enter the Shop Choice: ";
-                cin >> shopchoice;
-                if (shopchoice == 1)
-                {
-                    string menuItems[] = {"chicken Shawarma", "Zinger Shawarma", "Zinger Cheese Shawarma", "Chicken Mayo Shawarma", "Chicken Cheese Shawarma"};
-                    double menuPrices[] = {150, 200, 250, 160, 170};
-                    ShawarmaShop ss(menuItems, menuPrices, 5);
-                    ss.placeOrder();
-                    mp.describe();
-                }
-                else if (shopchoice == 2)
-                {
-                    string menuItems[] = {"Fries(small)", "Fries(regular)", "Box Patties", "Samosa", "Shami Burger", "Spring Roll", "Cold Drinks", "Juice", "Water Bottle"};
-                    double menuPrices[] = {50, 100, 70, 10, 100, 50, 80, 60, 50};
-                    PizzaFast pf(menuItems, menuPrices, 9);
-                    pf.placeOrder();
-                    mp.describe(); // Assuming you want to describe the CSBuilding again
-                }
-                else if (shopchoice == 3)
-                {
-                    string menuItems[] = {"Fries(small)", "Fries(regular)", "Chicken Biryani", "Beef Biryani", "Veg Biryani", "Mutton Biryani"};
-                    double menuPrices[] = {50, 100, 150, 180, 120, 200};
-                    Dhaba d(menuItems, menuPrices, 6);
-                    d.placeOrder();
-                    mp.describe();
-                }
-                else if (shopchoice == 4)
-                {
-                    string menuItems[] = {"Apple Juice", "Peach Juice", "Blue Berry", "Orange Juice", "Mango Juice", "Strawberry Juice", "Pineapple Juice", "Watermelon Juice", "Banana Juice"};
-                    double menuPrices[] = {50, 60, 70, 40, 80, 90, 100, 30, 20};
-                    JuiceShop js(menuItems, menuPrices, 9);
-                    js.placeOrder();
-                    mp.describe();
-                }
-                else if (shopchoice == 5)
-                {
-                    string menuItems[] = {"Soda", "Coke", "Pepsi", "Sprite", "Fanta"};
-                    double menuPrices[] = {30, 40, 50, 20, 25};
-                    SodaShop ss(menuItems, menuPrices, 5);
-                    ss.placeOrder();
-                    mp.describe();
-                }
-                else if (shopchoice == 6)
-                {
-                    string menuItems[] = {"Lemonade", "Hot Coffee", "Cold Coffee", "Lemonade+FizzUp"};
-                    double menuPrices[] = {20, 30, 40, 50};
-                    Cafeteria c(menuItems, menuPrices, 4);
-                    c.placeOrder();
-                    mp.describe();
-                }
-            }
-            else if (locationChoice == 4)
-            {
-                SportsArea sa;
-                Student s(name, &sa);
-                s.describeUser();
-                cout << "1. Shawarma Shop" << endl
-                     << "2. Pizza Fast" << endl
-                     << "3. Dhaba" << endl
-                     << "4. Juice Shop" << endl
-                     << "5. Soda Shop" << endl
-                     << "6. Cafeteria" << endl;
-                cout << "Enter the Shop Choice: ";
-                cin >> shopchoice;
-                if (shopchoice == 1)
-                {
-                    string menuItems[] = {"chicken Shawarma", "Zinger Shawarma", "Zinger Cheese Shawarma", "Chicken Mayo Shawarma", "Chicken Cheese Shawarma"};
-                    double menuPrices[] = {150, 200, 250, 160, 170};
-                    ShawarmaShop ss(menuItems, menuPrices, 5);
-                    ss.placeOrder();
-                    sa.describe();
-                }
-                else if (shopchoice == 2)
-                {
-                    string menuItems[] = {"Fries(small)", "Fries(regular)", "Box Patties", "Samosa", "Shami Burger", "Spring Roll", "Cold Drinks", "Juice", "Water Bottle"};
-                    double menuPrices[] = {50, 100, 70, 10, 100, 50, 80, 60, 50};
-                    PizzaFast pf(menuItems, menuPrices, 9);
-                    pf.placeOrder();
-                    sa.describe(); // Assuming you want to describe the CSBuilding again
-                }
-                else if (shopchoice == 3)
-                {
-                    string menuItems[] = {"Fries(small)", "Fries(regular)", "Chicken Biryani", "Beef Biryani", "Veg Biryani", "Mutton Biryani"};
-                    double menuPrices[] = {50, 100, 150, 180, 120, 200};
-                    Dhaba d(menuItems, menuPrices, 6);
-                    d.placeOrder();
-                    sa.describe();
-                }
-                else if (shopchoice == 4)
-                {
-                    string menuItems[] = {"Apple Juice", "Peach Juice", "Blue Berry", "Orange Juice", "Mango Juice", "Strawberry Juice", "Pineapple Juice", "Watermelon Juice", "Banana Juice"};
-                    double menuPrices[] = {50, 60, 70, 40, 80, 90, 100, 30, 20};
-                    JuiceShop js(menuItems, menuPrices, 9);
-                }
-                else if (shopchoice == 5)
-                {
-                    string menuItems[] = {"Soda", "Coke", "Pepsi", "Sprite", "Fanta"};
-                    double menuPrices[] = {30, 40, 50, 20, 25};
-                    SodaShop ss(menuItems, menuPrices, 5);
-                    ss.placeOrder();
-                    sa.describe();
-                }
-                else if (shopchoice == 6)
-                {
-                    string menuItems[] = {"Lemonade", "Hot Coffee", "Cold Coffee", "Lemonade+FizzUp"};
-                    double menuPrices[] = {20, 30, 40, 50};
-                    Cafeteria c(menuItems, menuPrices, 4);
-                }
-            }
-            else if (locationChoice == 5)
-            {
-                Auditorium a;
-                Student s(name, &a);
-                s.describeUser();
-                cout << "1. Shawarma Shop" << endl
-                     << "2. Pizza Fast" << endl
-                     << "3. Dhaba" << endl
-                     << "4. Juice Shop" << endl
-                     << "5. Soda Shop" << endl
-                     << "6. Cafeteria" << endl;
-                cout << "Enter the Shop Choice: ";
-                cin >> shopchoice;
-                if (shopchoice == 1)
-                {
-                    string menuItems[] = {"chicken Shawarma", "Zinger Shawarma", "Zinger Cheese Shawarma", "Chicken Mayo Shawarma", "Chicken Cheese Shawarma"};
-                    double menuPrices[] = {150, 200, 250, 160, 170};
-                    ShawarmaShop ss(menuItems, menuPrices, 5);
-                    ss.placeOrder();
-                    a.describe();
-                }
-                else if (shopchoice == 2)
-                {
-                    string menuItems[] = {"Fries(small)", "Fries(regular)", "Box Patties", "Samosa", "Shami Burger", "Spring Roll", "Cold Drinks", "Juice", "Water Bottle"};
-                    double menuPrices[] = {50, 100, 70, 10, 100, 50, 80, 60, 50};
-                    PizzaFast pf(menuItems, menuPrices, 9);
-                    pf.placeOrder();
-                    a.describe(); // Assuming you want to describe the CSBuilding again
-                }
-                else if (shopchoice == 3)
-                {
-                    string menuItems[] = {"Fries(small)", "Fries(regular)", "Chicken Biryani", "Beef Biryani", "Veg Biryani", "Mutton Biryani"};
-                    double menuPrices[] = {50, 100, 150, 180, 120, 200};
-                    Dhaba d(menuItems, menuPrices, 6);
-                    d.placeOrder();
-                    a.describe();
-                }
-                else if (shopchoice == 4)
-                {
-                    string menuItems[] = {"Apple Juice", "Peach Juice", "Blue Berry", "Orange Juice", "Mango Juice", "Strawberry Juice", "Pineapple Juice", "Watermelon Juice", "Banana Juice"};
-                    double menuPrices[] = {50, 60, 70, 40, 80, 90, 100, 30, 20};
-                    JuiceShop js(menuItems, menuPrices, 9);
-                }
-            }
-            else if (locationChoice == 6)
-            {
-                CommonRoom cr;
-                Student s(name, &cr);
-                s.describeUser();
-                cout << "1. Shawarma Shop" << endl
-                     << "2. Pizza Fast" << endl
-                     << "3. Dhaba" << endl
-                     << "4. Juice Shop" << endl
-                     << "5. Soda Shop" << endl
-                     << "6. Cafeteria" << endl;
-                cout << "Enter the Shop Choice: ";
-                cin >> shopchoice;
-                if (shopchoice == 1)
-                {
-                    string menuItems[] = {"chicken Shawarma", "Zinger Shawarma", "Zinger Cheese Shawarma", "Chicken Mayo Shawarma", "Chicken Cheese Shawarma"};
-                    double menuPrices[] = {150, 200, 250, 160, 170};
-                    ShawarmaShop ss(menuItems, menuPrices, 5);
-                    ss.placeOrder();
-                    cr.describe();
-                }
-                else if (shopchoice == 2)
-                {
-                    string menuItems[] = {"Fries(small)", "Fries(regular)", "Box Patties", "Samosa", "Shami Burger", "Spring Roll", "Cold Drinks", "Juice", "Water Bottle"};
-                    double menuPrices[] = {50, 100, 70, 10, 100, 50, 80, 60, 50};
-                    PizzaFast pf(menuItems, menuPrices, 9);
-                    pf.placeOrder();
-                    cr.describe(); // Assuming you want to describe the CSBuilding again
-                }
-                else if (shopchoice == 3)
-                {
-                    string menuItems[] = {"Fries(small)", "Fries(regular)", "Chicken Biryani", "Beef Biryani", "Veg Biryani", "Mutton Biryani"};
-                    double menuPrices[] = {50, 100, 150, 180, 120, 200};
-                    Dhaba d(menuItems, menuPrices, 6);
-                    d.placeOrder();
-                    cr.describe();
-                }
-                else if (shopchoice == 4)
-                {
-                    string menuItems[] = {"Apple Juice", "Peach Juice", "Blue Berry", "Orange Juice", "Mango Juice", "Strawberry Juice", "Pineapple Juice", "Watermelon Juice", "Banana Juice"};
-                    double menuPrices[] = {50, 60, 70, 40, 80, 90, 100, 30, 20};
-                    JuiceShop js(menuItems, menuPrices, 9);
-                    js.placeOrder();
-                    cr.describe();
-                }
-                else if (shopchoice == 5)
-                {
-                    string menuItems[] = {"Soda", "Coke", "Pepsi", "Sprite", "Fanta"};
-                    double menuPrices[] = {30, 40, 50, 20, 25};
-                    SodaShop ss(menuItems, menuPrices, 5);
-                    ss.placeOrder();
-                    cr.describe();
-                }
-                else if (shopchoice == 6)
-                {
-                    string menuItems[] = {"Lemonade", "Hot Coffee", "Cold Coffee", "Lemonade+FizzUp"};
-                    double menuPrices[] = {20, 30, 40, 50};
-                    Cafeteria c(menuItems, menuPrices, 4);
-                    c.placeOrder();
-                    cr.describe();
-                }
-            }
+        else
+        {
+            cout << "Invalid location choice......" << endl;
         }
     }
-
+}

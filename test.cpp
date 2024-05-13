@@ -81,29 +81,32 @@ public:
         int floorChoice;
         cout << "Select the floor: ";
         cin >> floorChoice;
-                do{
-        cout << "Select the floor: ";
-        cin >> floorChoice;
-        if (floorChoice != 0 && floorChoice != 1 && floorChoice != 2){
-            cout << "Invalid choice\nAgain" ;
-        } 
-    }while (floorChoice != 0 && floorChoice != 1 && floorChoice != 2);
-    cout << "Floor selected successfully!" << endl;
-                if (floorChoice == 0)
-                {
-                    floor.setFloorName("Basement");
-                }
-                else if (floorChoice == 1)
-                {
-                    floor.setFloorName("1st Floor");
-                }
-                else if (floorChoice == 2)
-                {
-                    floor.setFloorName("2nd Floor");
-                }
-                return getBuildingFloorName();
+        do
+        {
+            cout << "Select the floor: ";
+            cin >> floorChoice;
+            if (floorChoice != 0 && floorChoice != 1 && floorChoice != 2)
+            {
+                cout << "Invalid choice\nAgain";
+            }
+        } while (floorChoice != 0 && floorChoice != 1 && floorChoice != 2);
+        cout << "Floor selected successfully!" << endl;
+        if (floorChoice == 0)
+        {
+            floor.setFloorName("Basement");
+        }
+        else if (floorChoice == 1)
+        {
+            floor.setFloorName("1st Floor");
+        }
+        else if (floorChoice == 2)
+        {
+            floor.setFloorName("2nd Floor");
+        }
+        return getBuildingFloorName();
     }
-    void describe(){
+    void describe()
+    {
         cout << "CS Building    " << "Floor: " << floor.getFloorName() << endl;
     }
 };
@@ -141,35 +144,37 @@ public:
     {
         displayFloors();
         int floorChoice;
-                do{
-        cout << "Select the floor: ";
-        cin >> floorChoice;
-        if (floorChoice != 0 && floorChoice != 1 && floorChoice != 2 && floorChoice != 3 && floorChoice != 4){
-            cout << "Invalid choice\nAgain" ;
-        } 
-    }while (floorChoice != 0 && floorChoice != 1 && floorChoice != 2 && floorChoice != 3 && floorChoice != 4);
-    cout << "Floor selected successfully!" << endl;
-                if (floorChoice == 0)
-                {
-                    floor.setFloorName("Basement");
-                }
-                else if (floorChoice == 1)
-                {
-                    floor.setFloorName("B Floor");
-                }
-                else if (floorChoice == 2)
-                {
-                    floor.setFloorName("C Floor");
-                }
-                else if (floorChoice == 3)
-                {
-                    floor.setFloorName("D Floor");
-                }
-                else if (floorChoice == 4)
-                {
-                    floor.setFloorName("E Floor");
-                }
-                return getBuildingFloorName();
+        do
+        {
+            cout << "Select the floor: ";
+            cin >> floorChoice;
+            if (floorChoice != 0 && floorChoice != 1 && floorChoice != 2 && floorChoice != 3 && floorChoice != 4)
+            {
+                cout << "Invalid choice\nAgain";
+            }
+        } while (floorChoice != 0 && floorChoice != 1 && floorChoice != 2 && floorChoice != 3 && floorChoice != 4);
+        cout << "Floor selected successfully!" << endl;
+        if (floorChoice == 0)
+        {
+            floor.setFloorName("Basement");
+        }
+        else if (floorChoice == 1)
+        {
+            floor.setFloorName("B Floor");
+        }
+        else if (floorChoice == 2)
+        {
+            floor.setFloorName("C Floor");
+        }
+        else if (floorChoice == 3)
+        {
+            floor.setFloorName("D Floor");
+        }
+        else if (floorChoice == 4)
+        {
+            floor.setFloorName("E Floor");
+        }
+        return getBuildingFloorName();
     }
     void describe()
     {
@@ -250,39 +255,40 @@ protected:
     Location *location;
 
 public:
-    User() {} 
-    User(const string &name):name(name) {} 
+    User() {}
+    User(const string &name) : name(name) {}
     User(const string &name, Location *location) : name(name), location(location) {}
     virtual void describeUser() = 0;
     virtual ~User() {}
-friend ostream &operator<<( ostream &os, const Student &e );
-friend istream &operator>>( istream &is, Student &e );
+    friend ostream &operator<<(ostream &os, const Student &e);
+    friend istream &operator>>(istream &is, Student &e);
 };
 
 class Student : public User
 {
     double phoneNumber;
+
 public:
-    Student(){}
-    Student(const string &name, Location *location, double phoneNumber) : User(name, location) ,phoneNumber(phoneNumber) {}
+    Student() {}
+    Student(const string &name, Location *location, double phoneNumber) : User(name, location), phoneNumber(phoneNumber) {}
     void describeUser() override
     {
         cout << "Student " << name << " placing an order from ";
         location->describe();
     }
-friend ostream &operator<<( ostream &os, const Student &e );
-friend istream &operator>>( istream &is, Student &e );
-
+    friend ostream &operator<<(ostream &os, const Student &e);
+    friend istream &operator>>(istream &is, Student &e);
 };
 
-ostream& operator<<(ostream& os, const Student& e) //Overloading << operator
+ostream &operator<<(ostream &os, const Student &e) // Overloading << operator
 {
-    os <<"Student's name :" << e.name;
-    os <<"Student's Phone Number"<< e.phoneNumber;
-    os <<"Student's Location" << e.location;
-return os;
+    os << "Student's name :" << e.name;
+    os << "Student's Phone Number" << e.phoneNumber;
+    os << "Student's Location" << e.location;
+    return os;
 }
-istream &operator>>(istream &is, Student &e) {
+istream &operator>>(istream &is, Student &e)
+{
     cout << "Enter student's name: ";
     getline(is, e.name);
     cout << "Enter student's phone number: ";
@@ -294,25 +300,25 @@ class Faculty : public User
     string officeLocation;
 
 public:
-    Faculty(const string &name, int extensionNumber,string officeLocation) :extentionNumber(extentionNumber),officeLocation(officeLocation) ,User(name) {}
+    Faculty(const string &name, int extensionNumber, string officeLocation) : extentionNumber(extentionNumber), officeLocation(officeLocation), User(name) {}
     void describeUser() override
     {
         cout << "Faculty " << name << " placing an order from ";
         location->describe();
     }
-friend ostream &operator<<( ostream &os, const Faculty &e );
-friend istream &operator>>( istream &is, Faculty &e );
-
+    friend ostream &operator<<(ostream &os, const Faculty &e);
+    friend istream &operator>>(istream &is, Faculty &e);
 };
 
-ostream& operator<<(ostream& os, const Faculty& e) //Overloading << operator
+ostream &operator<<(ostream &os, const Faculty &e) // Overloading << operator
 {
-    os <<"Teacher's name :" << e.name;
-    os <<"Teacher's Extension Number"<< e.extentionNumber;
-    os <<"Teacher's Office location" << e.officeLocation;
-return os;
+    os << "Teacher's name :" << e.name;
+    os << "Teacher's Extension Number" << e.extentionNumber;
+    os << "Teacher's Office location" << e.officeLocation;
+    return os;
 }
-istream &operator>>(istream &is, Faculty &e) {
+istream &operator>>(istream &is, Faculty &e)
+{
     cout << "Enter Teacher's name: ";
     getline(is, e.name);
     cout << "Enter Teacher's Extention number: ";
@@ -455,16 +461,16 @@ public:
         const int menuSize = menu->getSize(); // Use the getter for size
         do
         {
-        cout << "Enter the number of the item you want to order: " <<endl;
-        cin >> choice;
-        if (choice <= 0 || choice > menuSize)
-        {
-            cout << "Invalid Input!\nAgain";
-        }
-        
+            cout << "Enter the number of the item you want to order: " << endl;
+            cin >> choice;
+            if (choice <= 0 || choice > menuSize)
+            {
+                cout << "Invalid Input!\nAgain";
+            }
+
         } while (choice <= 0 || choice > menuSize);
         cout << "Order placed for " << menu->getItem(choice - 1) << " at Shawarma Shop" << endl
-                 << "Thank you for ordering!" << endl;
+             << "Thank you for ordering!" << endl;
     }
 };
 class PizzaFast : public Shop
@@ -482,16 +488,16 @@ public:
         const int menuSize = menu->getSize(); // Use the getter for size
         do
         {
-        cout << "Enter the number of the item you want to order: " <<endl;
-        cin >> choice;
-        if (choice <= 0 || choice > menuSize)
-        {
-            cout << "Invalid Input!\nAgain";
-        }
-        
+            cout << "Enter the number of the item you want to order: " << endl;
+            cin >> choice;
+            if (choice <= 0 || choice > menuSize)
+            {
+                cout << "Invalid Input!\nAgain";
+            }
+
         } while (choice <= 0 || choice > menuSize);
         cout << "Order placed for " << menu->getItem(choice - 1) << " at Pizza Fast" << endl
-                 << "Thank you for ordering!" << endl;
+             << "Thank you for ordering!" << endl;
     }
 };
 class Dhaba : public Shop
@@ -509,16 +515,16 @@ public:
         const int menuSize = menu->getSize(); // Use the getter for size
         do
         {
-        cout << "Enter the number of the item you want to order: " <<endl;
-        cin >> choice;
-        if (choice <= 0 || choice > menuSize)
-        {
-            cout << "Invalid Input!\nAgain";
-        }
-        
+            cout << "Enter the number of the item you want to order: " << endl;
+            cin >> choice;
+            if (choice <= 0 || choice > menuSize)
+            {
+                cout << "Invalid Input!\nAgain";
+            }
+
         } while (choice <= 0 || choice > menuSize);
         cout << "Order placed for " << menu->getItem(choice - 1) << " at Dhaba" << endl
-                 << "Thank you for ordering!" << endl;
+             << "Thank you for ordering!" << endl;
     }
 };
 class JuiceShop : public Shop
@@ -536,16 +542,16 @@ public:
         const int menuSize = menu->getSize(); // Use the getter for size
         do
         {
-        cout << "Enter the number of the item you want to order: " <<endl;
-        cin >> choice;
-        if (choice <= 0 || choice > menuSize)
-        {
-            cout << "Invalid Input!\nAgain";
-        }
-        
+            cout << "Enter the number of the item you want to order: " << endl;
+            cin >> choice;
+            if (choice <= 0 || choice > menuSize)
+            {
+                cout << "Invalid Input!\nAgain";
+            }
+
         } while (choice <= 0 || choice > menuSize);
         cout << "Order placed for " << menu->getItem(choice - 1) << " at juics Shop" << endl
-                 << "Thank you for ordering!" << endl;
+             << "Thank you for ordering!" << endl;
     }
 };
 class SodaShop : public Shop
@@ -563,16 +569,16 @@ public:
         const int menuSize = menu->getSize(); // Use the getter for size
         do
         {
-        cout << "Enter the number of the item you want to order: " <<endl;
-        cin >> choice;
-        if (choice <= 0 || choice > menuSize)
-        {
-            cout << "Invalid Input!\nAgain";
-        }
-        
+            cout << "Enter the number of the item you want to order: " << endl;
+            cin >> choice;
+            if (choice <= 0 || choice > menuSize)
+            {
+                cout << "Invalid Input!\nAgain";
+            }
+
         } while (choice <= 0 || choice > menuSize);
         cout << "Order placed for " << menu->getItem(choice - 1) << " at Soda Shop" << endl
-                 << "Thank you for ordering!" << endl;
+             << "Thank you for ordering!" << endl;
     }
 };
 class Cafeteria : public Shop
@@ -590,16 +596,16 @@ public:
         const int menuSize = menu->getSize(); // Use the getter for size
         do
         {
-        cout << "Enter the number of the item you want to order: " <<endl;
-        cin >> choice;
-        if (choice <= 0 || choice > menuSize)
-        {
-            cout << "Invalid Input!\nAgain";
-        }
-        
+            cout << "Enter the number of the item you want to order: " << endl;
+            cin >> choice;
+            if (choice <= 0 || choice > menuSize)
+            {
+                cout << "Invalid Input!\nAgain";
+            }
+
         } while (choice <= 0 || choice > menuSize);
         cout << "Order placed for " << menu->getItem(choice - 1) << " at Cafeteria" << endl
-                 << "Thank you for ordering!" << endl;
+             << "Thank you for ordering!" << endl;
     }
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////

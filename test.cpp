@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 using namespace std;
+#include <fstream>
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -358,12 +359,32 @@ public:
     }
     friend ostream &operator<<(ostream &os, const Student &e);
     friend istream &operator>>(istream &is, Student &e);
+    string getName()
+    {
+        return name;
+    }
+    string getPhoneNo()
+    {
+        return phoneNo;
+    }
+    string getRollNo()
+    {
+        return rollNo;
+    }
+    string getLocation()
+    {
+        return location->getBuildingName();
+    }
+    string getFloor()
+    {
+        return location->getBuildingFloorName();
+    }
 };
 
 ostream &operator<<(ostream &os, const Student &e) // Overloading << operator
 {
-    os << endl; 
-    os<< "-----------------------------------------------------------------" << endl;
+    os << endl;
+    os << "-----------------------------------------------------------------" << endl;
     os << "Student's name :" << e.name << endl;
     os << "Student's Roll No: " << e.rollNo << endl;
     os << "Student's Phone No: " << e.phoneNo << endl;
@@ -378,18 +399,18 @@ istream &operator>>(istream &is, Student &e)
 {
     cout << "Enter student's name: ";
     getline(is, e.name);
-    cout << "Enter the student's roll No: " ;
+    cout << "Enter the student's roll No: ";
     getline(cin, e.rollNo);
-    cout << "Enter the student's phone No: " ;
+    cout << "Enter the student's phone No: ";
     getline(cin, e.phoneNo);
 
     int choice;
-    cout << "Choose 1 if you want to order from the building or 2 for some other location: " ;
+    cout << "Choose 1 if you want to order from the building or 2 for some other location: ";
     cin >> choice;
-    if (choice==1)
-    e.location = Building::selectLocation();
-    else if (choice ==2)
-    e.location = Location::selectLocation();
+    if (choice == 1)
+        e.location = Building::selectLocation();
+    else if (choice == 2)
+        e.location = Location::selectLocation();
     return is;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -479,6 +500,18 @@ public:
             return empty;
         }
     }
+    const double &getPrice(int index) const
+    {
+        if (index >= 0 && index < size)
+        {
+            return prices[index];
+        }
+        else
+        {
+            static const double empty = -1.0;
+            return empty;
+        }
+    }
 };
 
 class Shop
@@ -546,18 +579,55 @@ public:
     void placeOrder() override
     {
         displayMenu();
-        cout << "Enter the number of the item you want to order: ";
-        int choice;
-        cin >> choice;
-        const int menuSize = menu->getSize(); // Use the getter for size
-        if (choice > 0 && choice <= menuSize)
+        char userChoice;
+        while (true)
         {
-            cout << "Order placed for " << menu->getItem(choice - 1) << " at Shawarma Shop" << endl
-                 << "Thank you for ordering!" << endl;
-        }
-        else
-        {
-            cout << "Invalid choice!" << endl;
+            cout << "Do you want to order or leave? (y/n): ";
+            cin >> userChoice;
+            if (userChoice == 'y' || userChoice == 'Y')
+            {
+                cout << "Enter the number of the item you want to order: ";
+                int itemChoice;
+                cin >> itemChoice;
+                const int menuSize = menu->getSize(); // Use the getter for size
+                if (itemChoice > 0 && itemChoice <= menuSize)
+                {
+                    cout << "Enter the quantity of the item: ";
+                    int quantity;
+                    cin >> quantity;
+                    double totalPrice = menu->getPrice(itemChoice - 1) * quantity;
+
+                    cout << "Order placed for " << quantity << " " << menu->getItem(itemChoice - 1) << " at Shawarma Shop" << endl
+                         << "Thank you for ordering!" << endl;
+
+                    std::ofstream billFile("bill.txt", std::ios::app); // Open in append mode
+                    if (billFile.is_open())
+                    {
+                        billFile << "Quantity: " << quantity << "\n"
+                                 << "Item: " << menu->getItem(itemChoice - 1) << "\n"
+                                 << "Price: " << menu->getPrice(itemChoice - 1) << "\n"
+                                 << "Total amount: " << totalPrice << "\n"
+                                 << "Location: " << "Shawarma Shop" << "\n\n"; // Replace with actual location
+                        billFile.close();
+                    }
+                    else
+                    {
+                        cout << "Unable to open file bill.txt" << endl;
+                    }
+                }
+                else
+                {
+                    cout << "Invalid choice!" << endl;
+                }
+            }
+            else if (userChoice == 'n' || userChoice == 'N')
+            {
+                break;
+            }
+            else
+            {
+                cout << "Invalid choice! Please enter y or n." << endl;
+            }
         }
     }
 };
@@ -568,22 +638,58 @@ public:
     {
         setMenu(size, menuItems, menuPrices);
     }
-
     void placeOrder() override
     {
         displayMenu();
-        cout << "Enter the number of the item you want to order: ";
-        int choice;
-        cin >> choice;
-        const int menuSize = menu->getSize(); // Use the getter for size
-        if (choice > 0 && choice <= menuSize)
+        char userChoice;
+        while (true)
         {
-            cout << "Order placed for " << menu->getItem(choice - 1) << " at Dhaba" << endl
-                 << "Thank you for ordering!" << endl;
-        }
-        else
-        {
-            cout << "Invalid choice!" << endl;
+            cout << "Do you want to order or leave? (y/n): ";
+            cin >> userChoice;
+            if (userChoice == 'y' || userChoice == 'Y')
+            {
+                cout << "Enter the number of the item you want to order: ";
+                int itemChoice;
+                cin >> itemChoice;
+                const int menuSize = menu->getSize(); // Use the getter for size
+                if (itemChoice > 0 && itemChoice <= menuSize)
+                {
+                    cout << "Enter the quantity of the item: ";
+                    int quantity;
+                    cin >> quantity;
+                    double totalPrice = menu->getPrice(itemChoice - 1) * quantity;
+
+                    cout << "Order placed for " << quantity << " " << menu->getItem(itemChoice - 1) << " at Pizza Fast" << endl
+                         << "Thank you for ordering!" << endl;
+
+                    std::ofstream billFile("bill.txt", std::ios::app); // Open in append mode
+                    if (billFile.is_open())
+                    {
+                        billFile << "Quantity: " << quantity << "\n"
+                                 << "Item: " << menu->getItem(itemChoice - 1) << "\n"
+                                 << "Price: " << menu->getPrice(itemChoice - 1) << "\n"
+                                 << "Total amount: " << totalPrice << "\n"
+                                 << "Location: " << "Pizza Fast" << "\n\n"; // Replace with actual location
+                        billFile.close();
+                    }
+                    else
+                    {
+                        cout << "Unable to open file bill.txt" << endl;
+                    }
+                }
+                else
+                {
+                    cout << "Invalid choice!" << endl;
+                }
+            }
+            else if (userChoice == 'n' || userChoice == 'N')
+            {
+                break;
+            }
+            else
+            {
+                cout << "Invalid choice! Please enter y or n." << endl;
+            }
         }
     }
 };
@@ -594,22 +700,58 @@ public:
     {
         setMenu(size, menuItems, menuPrices);
     }
-
     void placeOrder() override
     {
         displayMenu();
-        cout << "Enter the number of the item you want to order: ";
-        int choice;
-        cin >> choice;
-        const int menuSize = menu->getSize(); // Use the getter for size
-        if (choice > 0 && choice <= menuSize)
+        char userChoice;
+        while (true)
         {
-            cout << "Order placed for " << menu->getItem(choice - 1) << " at Dhaba" << endl
-                 << "Thank you for ordering!" << endl;
-        }
-        else
-        {
-            cout << "Invalid choice!" << endl;
+            cout << "Do you want to order or leave? (y/n): ";
+            cin >> userChoice;
+            if (userChoice == 'y' || userChoice == 'Y')
+            {
+                cout << "Enter the number of the item you want to order: ";
+                int itemChoice;
+                cin >> itemChoice;
+                const int menuSize = menu->getSize(); // Use the getter for size
+                if (itemChoice > 0 && itemChoice <= menuSize)
+                {
+                    cout << "Enter the quantity of the item: ";
+                    int quantity;
+                    cin >> quantity;
+                    double totalPrice = menu->getPrice(itemChoice - 1) * quantity;
+
+                    cout << "Order placed for " << quantity << " " << menu->getItem(itemChoice - 1) << " at Dhaba" << endl
+                         << "Thank you for ordering!" << endl;
+
+                    std::ofstream billFile("bill.txt", std::ios::app); // Open in append mode
+                    if (billFile.is_open())
+                    {
+                        billFile << "Quantity: " << quantity << "\n"
+                                 << "Item: " << menu->getItem(itemChoice - 1) << "\n"
+                                 << "Price: " << menu->getPrice(itemChoice - 1) << "\n"
+                                 << "Total amount: " << totalPrice << "\n"
+                                 << "Location: " << "Dhaba" << "\n\n"; // Replace with actual location
+                        billFile.close();
+                    }
+                    else
+                    {
+                        cout << "Unable to open file bill.txt" << endl;
+                    }
+                }
+                else
+                {
+                    cout << "Invalid choice!" << endl;
+                }
+            }
+            else if (userChoice == 'n' || userChoice == 'N')
+            {
+                break;
+            }
+            else
+            {
+                cout << "Invalid choice! Please enter y or n." << endl;
+            }
         }
     }
 };
@@ -625,18 +767,55 @@ public:
     void placeOrder() override
     {
         displayMenu();
-        cout << "Enter the number of the item you want to order: ";
-        int choice;
-        cin >> choice;
-        const int menuSize = menu->getSize(); // Use the getter for size
-        if (choice > 0 && choice <= menuSize)
+        char userChoice;
+        while (true)
         {
-            cout << "Order placed for " << menu->getItem(choice - 1) << " at Juice Shop" << endl
-                 << "Thank you for ordering!" << endl;
-        }
-        else
-        {
-            cout << "Invalid choice!" << endl;
+            cout << "Do you want to order or leave? (y/n): ";
+            cin >> userChoice;
+            if (userChoice == 'y' || userChoice == 'Y')
+            {
+                cout << "Enter the number of the item you want to order: ";
+                int itemChoice;
+                cin >> itemChoice;
+                const int menuSize = menu->getSize(); // Use the getter for size
+                if (itemChoice > 0 && itemChoice <= menuSize)
+                {
+                    cout << "Enter the quantity of the item: ";
+                    int quantity;
+                    cin >> quantity;
+                    double totalPrice = menu->getPrice(itemChoice - 1) * quantity;
+
+                    cout << "Order placed for " << quantity << " " << menu->getItem(itemChoice - 1) << " at Juice Shop" << endl
+                         << "Thank you for ordering!" << endl;
+
+                    std::ofstream billFile("bill.txt", std::ios::app); // Open in append mode
+                    if (billFile.is_open())
+                    {
+                        billFile << "Quantity: " << quantity << "\n"
+                                 << "Item: " << menu->getItem(itemChoice - 1) << "\n"
+                                 << "Price: " << menu->getPrice(itemChoice - 1) << "\n"
+                                 << "Total amount: " << totalPrice << "\n"
+                                 << "Location: " << "Juice Shop" << "\n\n"; // Replace with actual location
+                        billFile.close();
+                    }
+                    else
+                    {
+                        cout << "Unable to open file bill.txt" << endl;
+                    }
+                }
+                else
+                {
+                    cout << "Invalid choice!" << endl;
+                }
+            }
+            else if (userChoice == 'n' || userChoice == 'N')
+            {
+                break;
+            }
+            else
+            {
+                cout << "Invalid choice! Please enter y or n." << endl;
+            }
         }
     }
 };
@@ -647,22 +826,58 @@ public:
     {
         setMenu(size, menuItems, menuPrices);
     }
-
     void placeOrder() override
     {
         displayMenu();
-        cout << "Enter the number of the item you want to order: ";
-        int choice;
-        cin >> choice;
-        const int menuSize = menu->getSize(); // Use the getter for size
-        if (choice > 0 && choice <= menuSize)
+        char userChoice;
+        while (true)
         {
-            cout << "Order placed for " << menu->getItem(choice - 1) << " at Soda Shop" << endl
-                 << "Thank you for ordering!" << endl;
-        }
-        else
-        {
-            cout << "Invalid choice!" << endl;
+            cout << "Do you want to order or leave? (y/n): ";
+            cin >> userChoice;
+            if (userChoice == 'y' || userChoice == 'Y')
+            {
+                cout << "Enter the number of the item you want to order: ";
+                int itemChoice;
+                cin >> itemChoice;
+                const int menuSize = menu->getSize(); // Use the getter for size
+                if (itemChoice > 0 && itemChoice <= menuSize)
+                {
+                    cout << "Enter the quantity of the item: ";
+                    int quantity;
+                    cin >> quantity;
+                    double totalPrice = menu->getPrice(itemChoice - 1) * quantity;
+
+                    cout << "Order placed for " << quantity << " " << menu->getItem(itemChoice - 1) << " at Soda Shop" << endl
+                         << "Thank you for ordering!" << endl;
+
+                    std::ofstream billFile("bill.txt", std::ios::app); // Open in append mode
+                    if (billFile.is_open())
+                    {
+                        billFile << "Quantity: " << quantity << "\n"
+                                 << "Item: " << menu->getItem(itemChoice - 1) << "\n"
+                                 << "Price: " << menu->getPrice(itemChoice - 1) << "\n"
+                                 << "Total amount: " << totalPrice << "\n"
+                                 << "Location: " << "Soda Shop" << "\n\n"; // Replace with actual location
+                        billFile.close();
+                    }
+                    else
+                    {
+                        cout << "Unable to open file bill.txt" << endl;
+                    }
+                }
+                else
+                {
+                    cout << "Invalid choice!" << endl;
+                }
+            }
+            else if (userChoice == 'n' || userChoice == 'N')
+            {
+                break;
+            }
+            else
+            {
+                cout << "Invalid choice! Please enter y or n." << endl;
+            }
         }
     }
 };
@@ -673,22 +888,58 @@ public:
     {
         setMenu(size, menuItems, menuPrices);
     }
-
     void placeOrder() override
     {
         displayMenu();
-        cout << "Enter the number of the item you want to order: ";
-        int choice;
-        cin >> choice;
-        const int menuSize = menu->getSize(); // Use the getter for size
-        if (choice > 0 && choice <= menuSize)
+        char userChoice;
+        while (true)
         {
-            cout << "Order placed for " << menu->getItem(choice - 1) << " at Cafeteria" << endl
-                 << "Thank you for ordering!" << endl;
-        }
-        else
-        {
-            cout << "Invalid choice!" << endl;
+            cout << "Do you want to order or leave? (y/n): ";
+            cin >> userChoice;
+            if (userChoice == 'y' || userChoice == 'Y')
+            {
+                cout << "Enter the number of the item you want to order: ";
+                int itemChoice;
+                cin >> itemChoice;
+                const int menuSize = menu->getSize(); // Use the getter for size
+                if (itemChoice > 0 && itemChoice <= menuSize)
+                {
+                    cout << "Enter the quantity of the item: ";
+                    int quantity;
+                    cin >> quantity;
+                    double totalPrice = menu->getPrice(itemChoice - 1) * quantity;
+
+                    cout << "Order placed for " << quantity << " " << menu->getItem(itemChoice - 1) << " at Cafeteria" << endl
+                         << "Thank you for ordering!" << endl;
+
+                    std::ofstream billFile("bill.txt", std::ios::app); // Open in append mode
+                    if (billFile.is_open())
+                    {
+                        billFile << "Quantity: " << quantity << "\n"
+                                 << "Item: " << menu->getItem(itemChoice - 1) << "\n"
+                                 << "Price: " << menu->getPrice(itemChoice - 1) << "\n"
+                                 << "Total amount: " << totalPrice << "\n"
+                                 << "Location: " << "Cafeteria" << "\n\n"; // Replace with actual location
+                        billFile.close();
+                    }
+                    else
+                    {
+                        cout << "Unable to open file bill.txt" << endl;
+                    }
+                }
+                else
+                {
+                    cout << "Invalid choice!" << endl;
+                }
+            }
+            else if (userChoice == 'n' || userChoice == 'N')
+            {
+                break;
+            }
+            else
+            {
+                cout << "Invalid choice! Please enter y or n." << endl;
+            }
         }
     }
 };
@@ -749,28 +1000,61 @@ Shop *Shop::createShop(int shopChoice)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class Service
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#include <fstream>
+#include <string>
+
+class Bill
 {
-    string serviceType;
+private:
+    std::string filename;
+    Student student;
+    double total;
 
 public:
-    Service(string serviceType) : serviceType(serviceType) {}
-};
+    Bill(const std::string &filename, const Student &student)
+        : filename(filename), student(student), total(0.0) {}
 
-class OrderService : public Service
-{
-public:
-    OrderService() : Service("Order Service") {}
+    void addOrder(int quantity, const std::string &item, const std::string &shopName, double price)
+    {
+        total += price * quantity;
+
+        std::ofstream file(filename, std::ios::app);
+
+        if (file.is_open())
+        {
+            file << quantity << "\t" << item << "\t" << shopName << "\t" << price << "\n";
+            file.close();
+        }
+        else
+        {
+            std::cout << "Unable to open file " << filename << "\n";
+        }
+    }
+
+    void saveToFile()
+    {
+        std::ofstream file(filename, std::ios::app);
+
+        if (file.is_open())
+        {
+            file << "Name: " << student.getName() << "\n";         // Assuming Student has a getName method
+            file << "Phone No: " << student.getPhoneNo() << "\n";  // Assuming Student has a getPhoneNo method
+            file << "Roll No: " << student.getRollNo() << "\n";    // Assuming Student has a getRollNo method
+            file << "Location: " << student.getLocation() << "\n"; // Assuming Student has a getLocation method
+            file << "----------------------------------------------------------------------------\n";
+            file << "Total: " << total << "\n";
+            file.close();
+        }
+        else
+        {
+            std::cout << "Unable to open file " << filename << "\n";
+        }
+    }
 };
-class PickupService : public Service
-{
-public:
-    PickupService() : Service("Pickup Service") {}
-};
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int main()
 {
     cout << "Welcome to the FAST EATS APP!" << endl;
@@ -786,7 +1070,7 @@ int main()
 
     if (userchoice == 1)
     {
-        
+
         Location::displayAllLocations();
         cout << "you want to order from the building or the other location: ";
         cin >> locationChoice;
@@ -803,7 +1087,7 @@ int main()
                 cout << "Enter the details:  " << endl;
                 cin.ignore();
                 cin >> s;
-                
+
                 s.describeUser();
                 Shop::displayAllShops();
                 int shopChoice = Shop::selectShop();
@@ -827,12 +1111,12 @@ int main()
 
         else if (locationChoice == 2)
         {
-           // location = Location::selectLocation();
+            // location = Location::selectLocation();
             if (location != nullptr)
             {
                 Student s;
                 cout << "Enter the details:  " << endl;
-               cin >> s;
+                cin >> s;
                 s.describeUser();
                 Shop::displayAllShops();
                 int shopChoice = Shop::selectShop();
@@ -848,7 +1132,7 @@ int main()
                     cout << "Invalid shop choice......" << endl;
                     delete location;
                 }
-               // delete location; // Don't forget to delete the location pointer when you're done with it
+                // delete location; // Don't forget to delete the location pointer when you're done with it
             }
             else
             {

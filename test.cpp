@@ -1111,7 +1111,7 @@ int main()
 
         else if (locationChoice == 2)
         {
-            // location = Location::selectLocation();
+            location = Location::selectLocation();
             if (location != nullptr)
             {
                 Student s;
@@ -1138,8 +1138,7 @@ int main()
             {
                 cout << "Invalid location choice......" << endl;
             }
-        }
-        else
+        }else
         {
             cout << "Invalid location choice......" << endl;
         }

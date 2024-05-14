@@ -418,15 +418,15 @@ class Faculty : public User
 {
 public:
     Faculty() {}
-    Faculty(const string& name,const int ext, const string& officeLocation) : User(name), extensionNumber(ext), officeLocation(officeLocation) {}
+    Faculty(const string &name, const int ext, const string &officeLocation) : User(name), extensionNumber(ext), officeLocation(officeLocation) {}
 
     void describeUser() override
     {
         cout << "Faculty " << name << " (Extension: " << extensionNumber << ") ordering from " << officeLocation << endl;
     }
 
-    friend ostream& operator<<(ostream& os, const Faculty& f);
-    friend istream& operator>>(istream& is, Faculty& f);
+    friend ostream &operator<<(ostream &os, const Faculty &f);
+    friend istream &operator>>(istream &is, Faculty &f);
 
     string getName() const
     {
@@ -448,7 +448,7 @@ private:
     string officeLocation;
 };
 
-ostream& operator<<(ostream& os, const Faculty& f)
+ostream &operator<<(ostream &os, const Faculty &f)
 {
     os << endl;
     os << "-----------------------------------------------------------------" << endl;
@@ -458,7 +458,7 @@ ostream& operator<<(ostream& os, const Faculty& f)
     return os;
 }
 
-istream& operator>>(istream& is, Faculty& f)
+istream &operator>>(istream &is, Faculty &f)
 {
     cout << "Enter faculty's name: ";
     getline(is, f.name);
@@ -1132,85 +1132,89 @@ int main()
 
     if (userchoice == 1)
     {
-            int ser;
+        int ser;
         do
         {
-            cout << "Do you wan't pickup or dilevery service (press 1 for pickup, 2 for dilevery):" <<endl;
+            cout << "Do you wan't pickup or dilevery service (press 1 for pickup, 2 for dilevery):" << endl;
             cin >> ser;
-            if (ser==2 )
+            if (ser == 2)
             {
                 Location::displayAllLocations();
-        cout << "you want to order from the building or the other location: ";
-        cin >> locationChoice;
-        Building *building;
-        Location *location;
-        if (locationChoice == 1)
-        {
-            building = Building::selectLocation();
-            if (building != nullptr)
-            {
-                string floorName = building->selectFloor();
-
-                Student s(building);
-                cout << "Enter the details:  " << endl;
-                cin.ignore();
-                cin >> s;
-
-                s.describeUser();
-                Shop::displayAllShops();
-                int shopChoice = Shop::selectShop();
-
-                Shop *shop = Shop::createShop(shopChoice);
-                if (shop != nullptr)
+                cout << "you want to order from the building or the other location: ";
+                cin >> locationChoice;
+                Building *building;
+                Location *location;
+                if (locationChoice == 1)
                 {
-                    shop->processOrder(*location);
+                    building = Building::selectLocation();
+                    if (building != nullptr)
+                    {
+                        string floorName = building->selectFloor();
+
+                        Student s(building);
+                        cout << "Enter the details:  " << endl;
+                        cin.ignore();
+                        cin >> s;
+
+                        s.describeUser();
+                        Shop::displayAllShops();
+                        int shopChoice = Shop::selectShop();
+
+                        Shop *shop = Shop::createShop(shopChoice);
+                        if (shop != nullptr)
+                        {
+                            shop->processOrder(*location);
+                        }
+                        else
+                        {
+                            cout << "Invalid shop choice......" << endl;
+                        }
+                        delete building;
+                    }
+                    else
+                    {
+                        cout << "Invalid location choice......" << endl;
+                    }
+                }
+
+                else if (locationChoice == 2)
+                {
+                    location = Location::selectLocation();
+                    if (location != nullptr)
+                    {
+                        Student s;
+                        cout << "Enter the details:  " << endl;
+                        cin.ignore();
+                        cin >> s;
+                        s.describeUser();
+                        Shop::displayAllShops();
+                        int shopChoice = Shop::selectShop();
+
+                        Shop *shop = Shop::createShop(shopChoice);
+                        if (shop != nullptr)
+                        {
+                            shop->processOrder(*location);
+                            delete location;
+                        }
+                        else
+                        {
+                            cout << "Invalid shop choice......" << endl;
+                            delete location;
+                        }
+                        // delete location; // Don't forget to delete the location pointer when you're done with it
+                    }
+                    else
+                    {
+                        cout << "Invalid location choice......" << endl;
+                    }
                 }
                 else
                 {
-                    cout << "Invalid shop choice......" << endl;
+                    cout << "Invalid location choice......" << endl;
                 }
-                delete building;
             }
-            else
+            else if (ser == 1)
             {
-                cout << "Invalid location choice......" << endl;
-            }
-        }
-
-        else if (locationChoice == 2)
-        {
-            location = Location::selectLocation();
-            if (location != nullptr)
-            {
-                Student s;
-                cout << "Enter the details:  " << endl;
-                cin.ignore();
-                cin >> s;
-                s.describeUser();
-                Shop::displayAllShops();
-                int shopChoice = Shop::selectShop();
-
-                Shop *shop = Shop::createShop(shopChoice);
-                if (shop != nullptr)
-                {
-                    shop->processOrder(*location);
-                    delete location;
-                }
-                else
-                {
-                    cout << "Invalid shop choice......" << endl;
-                    delete location;
-                }
-                // delete location; // Don't forget to delete the location pointer when you're done with it
-            }else
-            {
-                cout << "Invalid location choice......" << endl;
-            }
-        }else
-        {
-            cout << "Invalid location choice......" << endl;
-        }
-            }else if(ser==1){ 
                 Student s;
                 cout << "Enter the details:  " << endl;
                 cin.ignore();
@@ -1222,67 +1226,67 @@ int main()
                 Shop *shop = Shop::createShop(shopChoice);
                 shop->processOrder("piclup service");
             }
-            if(ser!=1 && ser!=2){
+            if (ser != 1 && ser != 2)
+            {
                 cout << "Invorrect option!\nKindly please state ";
             }
-        } while (ser!=1 && ser!=2);
-        
-        
-        
-    }else if (userchoice == 2)
- {
+        } while (ser != 1 && ser != 2);
+    }
+    else if (userchoice == 2)
+    {
         string facultyName;
         int extensionNumber;
         string officeLocation;
 
         cout << "Enter faculty name: ";
-    cin.ignore(); // Ignore the newline character left in the input buffer
-    getline(cin, facultyName);
+        cin.ignore(); // Ignore the newline character left in the input buffer
+        getline(cin, facultyName);
 
-    cout << "Enter extension number: ";
-    cin >> extensionNumber;
-    cin.ignore(); // Ignore the newline character left in the input buffer
+        cout << "Enter extension number: ";
+        cin >> extensionNumber;
+        cin.ignore(); // Ignore the newline character left in the input buffer
 
-    cout << "Enter office location: ";
-    getline(cin, officeLocation);
+        cout << "Enter office location: ";
+        getline(cin, officeLocation);
 
-Faculty f(facultyName, extensionNumber, officeLocation);
-f.describeUser();
-Shop::displayAllShops();
-int shopChoice = Shop::selectShop();
+        Faculty f(facultyName, extensionNumber, officeLocation);
+        f.describeUser();
+        Shop::displayAllShops();
+        int shopChoice = Shop::selectShop();
 
-int ser;
-Shop *shop = Shop::createShop(shopChoice);
-do
-{
-    cout << "Do you wan't pickup or dilevery service (press 1 for pickup, 2 for dilevery):" <<endl;
-        cin >> ser;
-        if (ser==1 ){
-            if (shop != nullptr){
-            shop->processOrder("Pickup Service");
-            }
-            else
-            {
-                cout << "Invalid shop choice..." << endl;
-            }
-        }else if (ser ==2)
+        int ser;
+        Shop *shop = Shop::createShop(shopChoice);
+        do
         {
-            if (shop != nullptr)
-            {   shop->processOrder(officeLocation);
-            }
-            else
+            cout << "Do you wan't pickup or dilevery service (press 1 for pickup, 2 for dilevery):" << endl;
+            cin >> ser;
+            if (ser == 1)
             {
-                cout << "Invalid shop choice..." << endl;
+                if (shop != nullptr)
+                {
+                    shop->processOrder("Pickup Service");
+                }
+                else
+                {
+                    cout << "Invalid shop choice..." << endl;
+                }
+            }
+            else if (ser == 2)
+            {
+                if (shop != nullptr)
+                {
+                    shop->processOrder(officeLocation);
+                }
+                else
+                {
+                    cout << "Invalid shop choice..." << endl;
+                }
             }
 
-}
-      
-        
-    if(ser!=1 && ser!=2){
-        cout << "Invorrect option!\nKindly please state ";
+            if (ser != 1 && ser != 2)
+            {
+                cout << "Invorrect option!\nKindly please state ";
+            }
+        } while (ser != 1 && ser != 2);
     }
-} while (ser!=1 && ser!=2);
- }
-
-
 }

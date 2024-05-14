@@ -6,6 +6,7 @@ using namespace std;
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
+double totalBill = 0.0;
 class Floor
 {
     string floorName;
@@ -248,11 +249,11 @@ Building *Building ::selectLocation()
     switch (choice)
     {
     case 1:
-        return new CSBuilding(); // Assuming CSBuilding is a subclass of Building
+        return new CSBuilding();
     case 2:
-        return new EEBuilding(); // Assuming EEBuilding is a subclass of Building
+        return new EEBuilding();
     case 3:
-        return new MultipurposeBuilding(); // Assuming MultipurposeBuilding is a subclass of Building
+        return new MultipurposeBuilding();
     default:
         cout << "Invalid choice. Please select a valid building.";
         return nullptr;
@@ -404,14 +405,6 @@ istream &operator>>(istream &is, Student &e)
     getline(cin, e.rollNo);
     cout << "Enter the student's phone No: ";
     getline(cin, e.phoneNo);
-
-    int choice;
-    cout << "Choose 1 if you want to order from the building or 2 for some other location: ";
-    cin >> choice;
-    if (choice == 1)
-        e.location = Building::selectLocation();
-    else if (choice == 2)
-        e.location = Location::selectLocation();
     return is;
 }
 class Faculty : public User
@@ -512,25 +505,6 @@ public:
             prices[i] = other.prices[i];
         }
     }
-
-    // Menu &operator=(const Menu &other)
-    // {
-    //     if (this != &other)
-    //     {
-    //         delete[] items;
-    //         delete[] prices;
-    //         size = other.size;
-    //         items = new string[size];
-    //         prices = new double[size];
-    //         for (int i = 0; i < size; i++)
-    //         {
-    //             items[i] = other.items[i];
-    //             prices[i] = other.prices[i];
-    //         }
-    //     }
-    //     return *this;
-    // }
-
     void displayMenu() const
     {
         for (int i = 0; i < size; i++)
@@ -538,8 +512,6 @@ public:
             cout << i + 1 << ". " << items[i] << " - Rs/" << prices[i] << endl;
         }
     }
-
-    // Getter functions
     int getSize() const
     {
         return size;
@@ -658,6 +630,7 @@ public:
                     int quantity;
                     cin >> quantity;
                     double totalPrice = menu->getPrice(itemChoice - 1) * quantity;
+                    totalBill += totalPrice;
 
                     cout << "Order placed for " << quantity << " " << menu->getItem(itemChoice - 1) << " at Shawarma Shop" << endl
                          << "Thank you for ordering!" << endl;
@@ -666,10 +639,14 @@ public:
                     if (billFile.is_open())
                     {
                         billFile << "Quantity: " << quantity << "\n"
-                                 << "Item: " << menu->getItem(itemChoice - 1) << "\n"
-                                 << "Price: " << menu->getPrice(itemChoice - 1) << "\n"
-                                 << "Total amount: " << totalPrice << "\n"
-                                 << "Location: " << "Shawarma Shop" << "\n\n"; // Replace with actual location
+                                 << "Item: " << menu->getItem(itemChoice - 1) << endl
+                                 << "Price: " << menu->getPrice(itemChoice - 1) << endl
+                                 << "Total amount: " << totalPrice << endl
+                                 << "Location: " << "Shawarma Shop" << endl;
+
+                        billFile << "Total bill: " << totalBill << endl
+                                 << endl;
+
                         billFile.close();
                     }
                     else
@@ -1066,8 +1043,6 @@ Shop *Shop::createShop(int shopChoice)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#include <fstream>
-#include <string>
 
 class Bill
 {
@@ -1119,7 +1094,10 @@ public:
 };
 int main()
 {
-    cout << "Welcome to the FAST EATS APP!" << endl;
+    std::ofstream billFile("bill.txt", std::ofstream::out | std::ofstream::trunc);
+    billFile.close();
+    cout
+        << "Welcome to the FAST EATS APP!" << endl;
     cout << "Please select your role:" << endl;
     cout << "1. Student" << endl
          << "2. Faculty" << endl;
@@ -1224,11 +1202,11 @@ int main()
                 int shopChoice = Shop::selectShop();
 
                 Shop *shop = Shop::createShop(shopChoice);
-                shop->processOrder("piclup service");
+                shop->processOrder("pickup service");
             }
             if (ser != 1 && ser != 2)
             {
-                cout << "Invorrect option!\nKindly please state ";
+                cout << "Incorrect option!\nKindly please state ";
             }
         } while (ser != 1 && ser != 2);
     }

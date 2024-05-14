@@ -1132,8 +1132,14 @@ int main()
 
     if (userchoice == 1)
     {
-
-        Location::displayAllLocations();
+            int ser;
+        do
+        {
+            cout << "Do you wan't pickup or dilevery service (press 1 for pickup, 2 for dilevery):" <<endl;
+            cin >> ser;
+            if (ser==2 )
+            {
+                Location::displayAllLocations();
         cout << "you want to order from the building or the other location: ";
         cin >> locationChoice;
         Building *building;
@@ -1178,6 +1184,7 @@ int main()
             {
                 Student s;
                 cout << "Enter the details:  " << endl;
+                cin.ignore();
                 cin >> s;
                 s.describeUser();
                 Shop::displayAllShops();
@@ -1195,8 +1202,7 @@ int main()
                     delete location;
                 }
                 // delete location; // Don't forget to delete the location pointer when you're done with it
-            }
-            else
+            }else
             {
                 cout << "Invalid location choice......" << endl;
             }
@@ -1204,6 +1210,25 @@ int main()
         {
             cout << "Invalid location choice......" << endl;
         }
+            }else if(ser==1){ 
+                Student s;
+                cout << "Enter the details:  " << endl;
+                cin.ignore();
+                cin >> s;
+                s.describeUser();
+                Shop::displayAllShops();
+                int shopChoice = Shop::selectShop();
+
+                Shop *shop = Shop::createShop(shopChoice);
+                shop->processOrder("piclup service");
+            }
+            if(ser!=1 && ser!=2){
+                cout << "Invorrect option!\nKindly please state ";
+            }
+        } while (ser!=1 && ser!=2);
+        
+        
+        
     }else if (userchoice == 2)
  {
         string facultyName;
@@ -1226,15 +1251,38 @@ f.describeUser();
 Shop::displayAllShops();
 int shopChoice = Shop::selectShop();
 
+int ser;
 Shop *shop = Shop::createShop(shopChoice);
-if (shop != nullptr)
-{   shop->processOrder(officeLocation);
-}
-else
+do
 {
-    cout << "Invalid shop choice..." << endl;
-}
+    cout << "Do you wan't pickup or dilevery service (press 1 for pickup, 2 for dilevery):" <<endl;
+        cin >> ser;
+        if (ser==1 ){
+            if (shop != nullptr){
+            shop->processOrder("Pickup Service");
+            }
+            else
+            {
+                cout << "Invalid shop choice..." << endl;
+            }
+        }else if (ser ==2)
+        {
+            if (shop != nullptr)
+            {   shop->processOrder(officeLocation);
+            }
+            else
+            {
+                cout << "Invalid shop choice..." << endl;
+            }
 
 }
+      
+        
+    if(ser!=1 && ser!=2){
+        cout << "Invorrect option!\nKindly please state ";
+    }
+} while (ser!=1 && ser!=2);
+ }
+
 
 }

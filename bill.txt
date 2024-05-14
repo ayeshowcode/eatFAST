@@ -4,3 +4,27 @@ Price: 150
 Total amount: 150
 Location: Shawarma Shop
 
+Quantity: 3
+Item: Zinger Cheese Shawarma
+Price: 250
+Total amount: 750
+Location: Shawarma Shop
+
+Quantity: 1
+Item: chicken Shawarma
+Price: 150
+Total amount: 150
+Location: Shawarma Shop
+
+Quantity: 1
+Item: chicken Shawarma
+Price: 150
+Total amount: 150
+Location: Shawarma Shop
+
+Quantity: 1
+Item: chicken Shawarma
+Price: 150
+Total amount: 150
+Location: Shawarma Shop
+
